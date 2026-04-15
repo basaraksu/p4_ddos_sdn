@@ -1,0 +1,1 @@
+/* Sabit Değerler ve Register Boyutları */
