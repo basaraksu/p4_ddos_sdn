@@ -48,14 +48,22 @@ header ipv4_t {
     bit<32> dstAddr;
 }
 
-// Kendi özel verilerimizi (feature'ları) tutacağımız yer
-struct metadata {
+struct flow_features_t {
     bit<32> flow_id;
     bit<48> iat_max;
     bit<48> iat_sum;
-    bit<32> fwd_count; 
-    bit<32> bwd_count; 
+    bit<32> fwd_count;
+    bit<32> bwd_count;
     bit<32> packet_count;
+    bit<48> duration;
+    bit<32> fwd_header_len;
+    bit<32> bwd_header_len;
+    bit<48> bwd_iat_tot;
+    bit<48> fwd_iat_min;
+}
+
+struct metadata {
+    flow_features_t stats; // 'learn' yerine 'stats' dedik
 }
 struct headers{
     packet_out_header_t packet_out;
