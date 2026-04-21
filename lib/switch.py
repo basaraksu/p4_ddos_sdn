@@ -190,6 +190,22 @@ class SwitchConnection(object):
         else:
             for response in self.client_stub.Read(request):
                 yield response
+                
+    def ReadRegisters(self, register_id=None, index=None):
+        request = p4runtime_pb2.ReadRequest()
+        request.device_id = self.device_id
+        entity = request.entities.add()
+        register_entry = entity.register_entry # Counter yerine RegisterEntry
+        
+        if register_id is not None:
+            register_entry.register_id = register_id
+        if index is not None:
+            register_entry.index.index = index
+        
+        print("P4Runtime ReadRegisters:", request)
+        for response in self.client_stub.Read(request):
+            print("Received Read Response:", response)
+            yield response
 
     def WritePREEntry(self, pre_entry, dry_run=False):
         request = p4runtime_pb2.WriteRequest()

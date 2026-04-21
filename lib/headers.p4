@@ -5,21 +5,13 @@
 @controller_header("packet_out")
 header packet_out_header_t {
     bit<16> egress_port;
-    bit<32> flow_id;
-    bit<32> reason_code; // 0: Normal, 1: Register Request
-
+    //bit<16> mcast_grp;
 }
 
 // packet in 
 @controller_header("packet_in")
 header packet_in_header_t {
-    bit<16> ingress_port;
-    bit<32> reason_code; // 0: Normal, 1: Register RESPONSE
-    bit<32> flow_id;
-    bit<48> first_seen;
-    bit<48> last_seen;
-    bit<64> fwd_count;
-    bit<64> bwd_count;
+    bit<16>  ingress_port;
 }
 
 
@@ -56,40 +48,22 @@ header ipv4_t {
     bit<32> dstAddr;
 }
 
-header tcp_t {
-    bit<16> srcPort;
-    bit<16> dstPort;
-    bit<32> seqNo;
-    bit<32> ackNo;
-    bit<4>  dataOffset;
-    bit<3>  res;
-    bit<3>  ecn;
-    bit<6>  ctrl;
-    bit<16> window;
-    bit<16> checksum;
-    bit<16> urgentPtr;
-}
-
-header udp_t {
-    bit<16> srcPort;
-    bit<16> dstPort;
-    bit<16> length_;
-    bit<16> checksum;
-}
-
 struct flow_features_t {
     bit<32> flow_id;
-    bit<64> fwd_count;
-
+    bit<48> iat_max;
+    bit<48> iat_sum;
+    bit<32> fwd_count;
+    bit<32> bwd_count;
+    bit<32> packet_count;
+    bit<48> duration;
+    bit<32> fwd_header_len;
+    bit<32> bwd_header_len;
+    bit<48> bwd_iat_tot;
+    bit<48> fwd_iat_min;
 }
 
 struct metadata {
-    flow_features_t stats; 
-    bit<32> flow_id;
-    bit<32> first_ip;
-    bit<32> second_ip;
-    bit<16> src_port;
-    bit<16> dst_port;
+    flow_features_t stats; // 'learn' yerine 'stats' dedik
 }
 struct headers{
     packet_out_header_t packet_out;
@@ -97,6 +71,4 @@ struct headers{
     ethernet_t ethernet;
     ipv4_t ipv4;
     arp_t arp;
-    tcp_t tcp;
-    udp_t udp;
 }   
