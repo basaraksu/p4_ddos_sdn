@@ -80,7 +80,16 @@ header udp_t {
 struct flow_features_t {
     bit<32> flow_id;
     bit<64> fwd_count;
-
+    bit<64> bwd_count;
+    bit<48> duration;
+    bit<64> packet_size_sum;
+    bit<64> min_packet_size;
+    bit<64> max_packet_size;
+    bit<64> iat_sum;
+    bit<64> iat_sum_square;
+    bit<64> min_iat;
+    bit<64> max_iat;
+    bit<8> protocol;
 }
 
 struct metadata {
