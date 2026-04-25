@@ -11,6 +11,7 @@ from packet_in_thread import PacketInThread
 from digest_thread import DigestThread
 from feature_thread import FeatureThread
 from ml_engine_thread import MLEngineThread
+from csv_thread import CSVThread
 
 sys.path.append(
     os.path.join(os.path.dirname(os.path.abspath(__file__)),
@@ -51,9 +52,9 @@ class DDoSController:
             device_id=0)
 
         self.switch.MasterArbitrationUpdate()
-        self.switch.SetForwardingPipelineConfig(
-            p4info=self.p4info_helper.p4info,
-            bmv2_json_file_path=self.bmv2_json)
+        # self.switch.SetForwardingPipelineConfig(
+        #     p4info=self.p4info_helper.p4info,
+        #     bmv2_json_file_path=self.bmv2_json)
         
         digest_entry = self.p4info_helper.buildDigestEntry(digest_name="flow_features_t")
         self.switch.WriteDigestEntry(digest_entry)
@@ -65,14 +66,15 @@ class DDoSController:
         
     def run(self):
         self.setup_switch()
-        packet_in_thread = PacketInThread(self.switch, self)
+        #packet_in_thread = PacketInThread(self.switch, self)
         
         digest_thread = DigestThread(self.switch, self)
         feature_thread = FeatureThread(self.switch, self)
         ml_engine_thread = MLEngineThread(self.switch, self)
-        
-        packet_in_thread.start()
+        csv_thread = CSVThread(self.switch, self)
+        #packet_in_thread.start()
         digest_thread.start()
+        #csv_thread.start()
         feature_thread.start()
         ml_engine_thread.start()
         

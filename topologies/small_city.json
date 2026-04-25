@@ -4,42 +4,51 @@
             "ip": "10.0.1.1/24",
             "mac": "08:00:00:00:01:11",
             "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
                 "route add default gw 10.0.1.10 dev eth0",
                 "arp -i eth0 -s 10.0.1.10 08:00:00:00:01:00",
-                "while true; do echo 'TEMP: 24C, HUM: 45%' | nc -u -w 1 10.0.4.4 5000; sleep 5; done &"
+                "echo 'Trafik Kamerasi Baslatiliyor (Yuksek Trafik)...'",
+                "while true; do head -c 1000 /dev/urandom | nc -u -w 1 10.0.4.4 5000; sleep 0.1; done &"
             ]
         },
         "h2": {
             "ip": "10.0.2.2/24",
             "mac": "08:00:00:00:02:22",
             "commands": [
-                "route add default gw 10.0.2.20 dev eth0",
-                "arp -i eth0 -s 10.0.2.20 08:00:00:00:02:00",
-                "cat /dev/urandom | nc -u -w 1 10.0.4.4 6000 &"
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.2.10 dev eth0",
+                "arp -i eth0 -s 10.0.2.10 08:00:00:00:02:00",
+                "echo 'Akilli Sayaclar Baslatiliyor (Sik/Kucuk Paket)...'",
+                "while true; do echo 'sayac_verisi_v1' | nc -u -w 1 10.0.4.4 5001; sleep 2; done &"
             ]
         },
         "h3": {
             "ip": "10.0.3.3/24",
             "mac": "08:00:00:00:03:33",
             "commands": [
-                "route add default gw 10.0.3.30 dev eth0",
-                "arp -i eth0 -s 10.0.3.30 08:00:00:00:03:00",
-                "python3 -m http.server 80 &"
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.3.10 dev eth0",
+                "arp -i eth0 -s 10.0.3.10 08:00:00:00:03:00",
+                "echo 'Kamu Wi-Fi Baslatiliyor (Degisken)...'",
+                "while true; do echo 'web_istegi' | nc -u -w 1 10.0.4.4 80; sleep $((RANDOM % 5 + 1)); done &"
             ]
         },
         "h4": {
             "ip": "10.0.4.4/24",
             "mac": "08:00:00:00:04:44",
             "commands": [
-                "route add default gw 10.0.4.40 dev eth0",
-                "arp -i eth0 -s 10.0.4.40 08:00:00:00:04:00",
-                "nc -l -u -p 5000 > sensor_data.log &",
-                "nc -l -u -p 6000 > camera_feed.bin &"
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.4.10 dev eth0",
+                "arp -i eth0 -s 10.0.4.10 08:00:00:00:04:00",
+                "echo 'Veri Merkezi Dinlemede...'",
+                "nc -ul -p 5000 > /dev/null &",
+                "nc -ul -p 5001 > /dev/null &",
+                "nc -ul -p 80 > /dev/null &"
             ]
         }
     },
     "switches": {
-        "s1": { "cpu_port": 64 }
+        "s1": { "runtime_json": "s1-runtime.json" }
     },
     "links": [
         ["h1", "s1-p1"],

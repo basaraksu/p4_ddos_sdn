@@ -56,8 +56,6 @@ class PacketInThread(threading.Thread):
                 
                 
                 if flow_id not in self.controller.flow_stats_dict:
-                    fwd_count = int.from_bytes(metadata[5].value, byteorder='big') # Dikkat
-                    bwd_count = int.from_bytes(metadata[6].value, byteorder='big') # Dikkat
                     data = {
                         'flow_id': flow_id,
                         'src_ip': ips[0],

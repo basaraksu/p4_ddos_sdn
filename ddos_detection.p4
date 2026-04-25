@@ -6,7 +6,6 @@
 #include "p4src/includes/headers.p4"
 #include "p4src/includes/parsers.p4"
 
-const bit<9> CPU_PORT = 64;
 const bit<48> WINDOW_TIME = 5_000_000; // 5 saniye (nanosecond cinsinden)
 
 control MyVerifyChecksum(inout headers hdr, inout metadata meta) { apply { } } 
@@ -47,13 +46,13 @@ control MyIngress(inout headers hdr, inout metadata meta, inout standard_metadat
         // 3. TTL düşür
         // hdr.ipv4.ttl = hdr.ipv4.ttl - 1;
     }
-    action send_to_cpu() {
-        standard_metadata.egress_spec = CPU_PORT; // CPU portu
-    }
+    // action send_to_cpu() {
+    //     standard_metadata.egress_spec = CPU_PORT; // CPU portu
+    // }
 
-    action tracked_flow() {
-        // Bu akış zaten takip ediliyor, hiçbir şey yapma
-    }
+    // action tracked_flow() {
+    //     // Bu akış zaten takip ediliyor, hiçbir şey yapma
+    // }
 
 
     table ipv4_lpm {
@@ -62,42 +61,41 @@ control MyIngress(inout headers hdr, inout metadata meta, inout standard_metadat
         }
         actions = {
             ipv4_forward;
-            send_to_cpu;
             NoAction;
         }
         size = 1024;
-        default_action = send_to_cpu(); // Bilinmeyen paketleri CPU'ya gönder
+        default_action = NoAction();
     }
 
-    table flow_tracker {
-        key = {
-            meta.flow_id : exact; // Symmetric flow_id kullanıyoruz
-        }
-        actions = {
-            tracked_flow; // Hiçbir şey yapma, sadece "hit" olsun
-            NoAction;     
-        }
-        size = 65536;
-        default_action = NoAction(); 
-    }
+    // table flow_tracker {
+    //     key = {
+    //         meta.flow_id : exact; // Symmetric flow_id kullanıyoruz
+    //     }
+    //     actions = {
+    //         tracked_flow; // Hiçbir şey yapma, sadece "hit" olsun
+    //         NoAction;     
+    //     }
+    //     size = 65536;
+    //     default_action = NoAction(); 
+    // }
 
    apply {
 
-        if (standard_metadata.ingress_port == CPU_PORT) { 
-            standard_metadata.egress_spec = (bit<9>)hdr.packet_out.egress_port;
-            //hdr.ethernet.srcAddr = hdr.packet_out.dstAddr; // Controller'dan gelen gerçek host MA
-            return;
-        }
+        // if (standard_metadata.ingress_port == CPU_PORT) { 
+        //     standard_metadata.egress_spec = (bit<9>)hdr.packet_out.egress_port;
+        //     //hdr.ethernet.srcAddr = hdr.packet_out.dstAddr; // Controller'dan gelen gerçek host MA
+        //     return;
+        // }
 
-        if (hdr.arp.isValid()) {
-            send_to_cpu();
-            return;
-        }
+        // if (hdr.arp.isValid()) {
+        //     send_to_cpu();
+        //     return;
+        // }
 
         if (hdr.ipv4.isValid()) {
 
             bit<64> fwd_count = 0; bit<64> bwd_count = 0; bit<48> first_seen = 0; bit<48> last_seen = 0;
-            bool is_tracked = false;
+            //bool is_tracked = false;
             bit<48> current_time = standard_metadata.ingress_global_timestamp;
             bit<1> is_active = 0;
             bit<64> current_packet_size = (bit<64>)standard_metadata.packet_length;
@@ -117,25 +115,25 @@ control MyIngress(inout headers hdr, inout metadata meta, inout standard_metadat
                 { meta.first_ip, meta.second_ip, hdr.ipv4.protocol }, 
                 (bit<32>)65536);
 
-            if (flow_tracker.apply().miss) {
-                is_tracked = false;
-                // Tüm değerleri sıfırla
-                flow_packet_count_fwd.write(meta.flow_id, 0);
-                flow_packet_count_bwd.write(meta.flow_id, 0);
-                flow_packet_first_seen.write(meta.flow_id, 0);
-                flow_packet_last_seen.write(meta.flow_id, 0);
-                flow_packet_min_packet_size.write(meta.flow_id, 0);
-                flow_packet_max_packet_size.write(meta.flow_id, 0);
-                flow_packet_packet_size_sum.write(meta.flow_id, 0);
-                flow_packet_min_iat.write(meta.flow_id, 0);
-                flow_packet_max_iat.write(meta.flow_id, 0);
-                flow_packet_iat_sum.write(meta.flow_id, 0);
-                flow_packet_iat_sum_square.write(meta.flow_id, 0);
-                flow_is_active.write(meta.flow_id, 0);
-            }
-            else {
-                is_tracked = true;
-            }
+            // if (flow_tracker.apply().miss) {
+            //     is_tracked = false;
+            //     // Tüm değerleri sıfırla
+            //     flow_packet_count_fwd.write(meta.flow_id, 0);
+            //     flow_packet_count_bwd.write(meta.flow_id, 0);
+            //     flow_packet_first_seen.write(meta.flow_id, 0);
+            //     flow_packet_last_seen.write(meta.flow_id, 0);
+            //     flow_packet_min_packet_size.write(meta.flow_id, 0);
+            //     flow_packet_max_packet_size.write(meta.flow_id, 0);
+            //     flow_packet_packet_size_sum.write(meta.flow_id, 0);
+            //     flow_packet_min_iat.write(meta.flow_id, 0);
+            //     flow_packet_max_iat.write(meta.flow_id, 0);
+            //     flow_packet_iat_sum.write(meta.flow_id, 0);
+            //     flow_packet_iat_sum_square.write(meta.flow_id, 0);
+            //     flow_is_active.write(meta.flow_id, 0);
+            // }
+            // else {
+            //     is_tracked = true;
+            // }
             
             
             // Window aktif değilse first_seen'i güncelle, aktifse first_seen'i oku
@@ -246,11 +244,11 @@ control MyIngress(inout headers hdr, inout metadata meta, inout standard_metadat
                 flow_is_active.write(meta.flow_id, 0);
             }
             
-            // Eğer bu akış daha önce kaydedilmemişse (miss)
-            if (is_tracked == false) {
-                send_to_cpu(); // Paket 64. porta gider
-                return;        // LPM tablosuna bakma, paketi hemen gönder!
-            }
+            // // Eğer bu akış daha önce kaydedilmemişse (miss)
+            // if (is_tracked == false) {
+            //     send_to_cpu(); // Paket 64. porta gider
+            //     return;        // LPM tablosuna bakma, paketi hemen gönder!
+            // }
 
             // Akış takip ediliyorsa (hit), şimdi yönlendirme yapabiliriz
             ipv4_lpm.apply();
@@ -260,16 +258,16 @@ control MyIngress(inout headers hdr, inout metadata meta, inout standard_metadat
 
 control MyEgress(inout headers hdr, inout metadata meta, inout standard_metadata_t standard_metadata) { 
     apply {
-        // Eğer paket Controller'a (Port 64) gidiyorsa
-        if (standard_metadata.egress_port== CPU_PORT) { 
-            hdr.packet_in.setValid(); // Etiketi aktif et
-            hdr.packet_in.ingress_port = (bit<16>)standard_metadata.ingress_port; // Paketin geldiği portu ekle
-            hdr.packet_in.flow_id = meta.flow_id; // flow_id bilgisini ekle
-            flow_packet_count_fwd.read(hdr.packet_in.fwd_count, meta.flow_id);
-            flow_packet_count_bwd.read(hdr.packet_in.bwd_count, meta.flow_id);
-            flow_packet_first_seen.read(hdr.packet_in.first_seen, meta.flow_id);
-            flow_packet_last_seen.read(hdr.packet_in.last_seen, meta.flow_id);
-        }
+        // // Eğer paket Controller'a (Port 64) gidiyorsa
+        // if (standard_metadata.egress_port== CPU_PORT) { 
+        //     hdr.packet_in.setValid(); // Etiketi aktif et
+        //     hdr.packet_in.ingress_port = (bit<16>)standard_metadata.ingress_port; // Paketin geldiği portu ekle
+        //     hdr.packet_in.flow_id = meta.flow_id; // flow_id bilgisini ekle
+        //     flow_packet_count_fwd.read(hdr.packet_in.fwd_count, meta.flow_id);
+        //     flow_packet_count_bwd.read(hdr.packet_in.bwd_count, meta.flow_id);
+        //     flow_packet_first_seen.read(hdr.packet_in.first_seen, meta.flow_id);
+        //     flow_packet_last_seen.read(hdr.packet_in.last_seen, meta.flow_id);
+        // }
     } 
 }
 

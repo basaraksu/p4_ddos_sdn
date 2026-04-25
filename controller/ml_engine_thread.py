@@ -34,7 +34,7 @@ class MLEngineThread(threading.Thread):
                 scaled_features = self.scaler.transform(features_df)
                 prediction = self.model.predict(scaled_features)[0]
                 print(f"--- Tahmin alindi: Flow ID {flow_id}, Prediction: {prediction}")
-                print(f"    Features:\n{features_df.to_string()}")
+                #print(f"    Features:\n{features_df.to_string()}")
                 print(f"********************************************************************")
                 
                       

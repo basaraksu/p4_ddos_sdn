@@ -1,6 +1,6 @@
 BMV2_SWITCH_EXE = simple_switch_grpc
-TOPO = pod-topo/topology.json
-#TOPO = topologies/small_city.json
+#TOPO = pod-topo/topology.json
+TOPO = topologies/small_city.json
 #TOPO = topologies/medium_city.json
 #TOPO = topologies/large_city.json
 

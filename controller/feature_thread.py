@@ -37,13 +37,18 @@ class FeatureThread(threading.Thread):
                 
                 iat_count = raw_data['fwd_count'] + raw_data['bwd_count'] - 1
                 
+                variance_input = (raw_data['iat_sum_square'] / iat_count) - (raw_data['iat_sum'] / iat_count) ** 2 if iat_count > 0 else 0  
+
+                # Eğer sonuç çok küçük bir negatif sayıysa 0 kabul et
+                safe_variance = max(0, variance_input)
+                
                 # Özellikleri hesapla
                 processed_data = {
                     'flow_id': raw_data['flow_id'],
                     'flow_iat_min': raw_data['min_iat'],
                     'flow_iat_max': raw_data['max_iat'],
                     'flow_iat_mean': raw_data['iat_sum'] / iat_count if iat_count > 0 else 0,
-                    'flow_iat_std': ((raw_data['iat_sum_square'] / iat_count) - (raw_data['iat_sum'] / iat_count) ** 2) ** 0.5 if iat_count > 0 else 0,
+                    'flow_iat_std': safe_variance ** 0.5,
                     'rate_ratio': (raw_data['fwd_count'] / raw_data['bwd_count']) if raw_data['bwd_count'] > 0 else raw_data['fwd_count'] / 5,
                     #protocol': raw_data['protocol'],
                     'max_packet_length': raw_data['max_packet_size'],
@@ -69,17 +74,6 @@ class FeatureThread(threading.Thread):
                 feature['features'] = pd.DataFrame([feature['features']], columns=colnames)
                 
                 # print(f"--- Feature alindi: {feature['flow_id']} ---")
-                # print(f"--- Features ---")
-                # print(f"flow_iat_min: {processed_data['flow_iat_min']}")
-                # print(f"flow_iat_max: {processed_data['flow_iat_max']}")
-                # print(f"flow_iat_mean: {processed_data['flow_iat_mean']}")
-                # print(f"flow_iat_std: {processed_data['flow_iat_std']}")
-                # print(f"rate_ratio: {processed_data['rate_ratio']}")
-                # print(f"protocol: {processed_data['protocol']}")
-                # print(f"max_packet_length: {processed_data['max_packet_length']}")
-                # print(f"min_packet_length: {processed_data['min_packet_length']}")
-                # print(f"packet_length_mean: {processed_data['packet_length_mean']}")
-                # print(f"--- -------------------------------------- ---")
                 
                 
                 try:
