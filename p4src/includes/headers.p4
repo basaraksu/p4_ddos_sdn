@@ -79,17 +79,15 @@ header udp_t {
 
 struct flow_features_t {
     bit<32> flow_id;
+    bit<32> first_ip;
+    bit<32> second_ip;
+    bit<16> src_port;
+    bit<16> dst_port;
+    bit<8> protocol;
     bit<64> fwd_count;
     bit<64> bwd_count;
-    bit<48> duration;
     bit<64> packet_size_sum;
-    bit<64> min_packet_size;
-    bit<64> max_packet_size;
-    bit<64> iat_sum;
-    bit<64> iat_sum_square;
-    bit<64> min_iat;
-    bit<64> max_iat;
-    bit<8> protocol;
+    bit<64> duration;
 }
 
 struct metadata {
@@ -99,6 +97,7 @@ struct metadata {
     bit<32> second_ip;
     bit<16> src_port;
     bit<16> dst_port;
+    bit<8> protocol;
 }
 struct headers{
     packet_out_header_t packet_out;

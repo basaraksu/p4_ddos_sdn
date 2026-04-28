@@ -63,6 +63,11 @@ struct flow_features_t {
 }
 
 struct metadata {
+    bit<16> src_port;
+    bit<16> dst_port;
+    bit<32> first_ip;
+    bit<32> second_ip;
+    bit<32> flow_id;
     flow_features_t stats; // 'learn' yerine 'stats' dedik
 }
 struct headers{

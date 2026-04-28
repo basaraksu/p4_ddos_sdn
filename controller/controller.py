@@ -12,6 +12,7 @@ from digest_thread import DigestThread
 from feature_thread import FeatureThread
 from ml_engine_thread import MLEngineThread
 from csv_thread import CSVThread
+import pandas as pd
 
 sys.path.append(
     os.path.join(os.path.dirname(os.path.abspath(__file__)),
@@ -38,6 +39,8 @@ class DDoSController:
         
         self.q_digest = queue.Queue()  # Digest verilerini tutacak kuyruk
         self.q_feature = queue.Queue()  # İşlenmiş özellikleri tutacak kuyruk
+        self.features_list = []  # İşlenmiş özellikleri geçici olarak tutacak liste
+        self.BATCH_SIZE = 10  # CSV'ye yazmadan önce biriktirilecek özellik sayısı
         
     ...
     
@@ -71,7 +74,7 @@ class DDoSController:
         digest_thread = DigestThread(self.switch, self)
         feature_thread = FeatureThread(self.switch, self)
         ml_engine_thread = MLEngineThread(self.switch, self)
-        csv_thread = CSVThread(self.switch, self)
+        #csv_thread = CSVThread(self.switch, self)
         #packet_in_thread.start()
         digest_thread.start()
         #csv_thread.start()

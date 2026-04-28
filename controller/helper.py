@@ -1,4 +1,5 @@
 from scapy.all import *
+import pandas as pd
 
 def discover_host(controller, target_ip, ingress_port, sender_mac, sender_ip):
     pkt = Ether(dst="ff:ff:ff:ff:ff:ff", src=sender_mac) / \
@@ -97,3 +98,9 @@ def untrack_flow(controller, flow_id):
     del controller.flow_stats_dict[flow_id]
     print(f"--- Flow ID {flow_id} izlemeyi durduruldu ve veriler silindi. ---")
 ...
+
+
+def write_to_csv(features_list, colnames):
+    df = pd.DataFrame(features_list, columns=colnames)
+    is_file_new = os.path.exists("features.csv")
+    df.to_csv("features.csv", mode='a', header=not is_file_new, index=False)

@@ -3,6 +3,8 @@ import threading
 import time
 import queue
 import pandas as pd
+from helper import write_to_csv
+import ipaddress
 
 class FeatureThread(threading.Thread):
     def __init__(self, switch, controller, daemon=True):
@@ -21,66 +23,55 @@ class FeatureThread(threading.Thread):
                 if not raw_data:
                     continue
                 
-                # raw_data
-                # ['flow_id', 'fwd_count', 'bwd_count', 'duration', 'packet_size_sum', 
-                # 'min_packet_size', 'max_packet_size', 'iat_sum', 'iat_sum_square', 
-                # 'min_iat', 'max_iat', 'protocol']
+                # digestten gelen raw_data
+                # flow_id, first_ip, second_ip, src_port, dst_port, protocol, fwd_count, bwd_count, packet_size_sum, duration, iat_sum, iat_sum_square, min_iat, max_iat
                 
-                # Özellik Sırası:
-                # ['flow iat min', 'flow iat max', 'flow iat mean', 'flow iat std', 
-                # 'rate_ratio', 'protocol', 'max packet length', 'min packet length', 
-                # 'packet length mean']
+                colnames = ['flow_id', 'firstIp', 'secondIp', 'firstPort', 'secondPort', 'fwd_count', 'bwd_count', 'N_IN_Conn_P_DstIP', 'TnP_PDstIP', 'Srate', 'Drate', 'Dur', 'Bytes', 'proto_number']
                 
-                colnames = ['flow iat min', 'flow iat max', 'flow iat mean', 'flow iat std', 
-                            'rate_ratio', 'max packet length', 'min packet length', 
-                            'packet length mean']
-                
-                iat_count = raw_data['fwd_count'] + raw_data['bwd_count'] - 1
-                
-                variance_input = (raw_data['iat_sum_square'] / iat_count) - (raw_data['iat_sum'] / iat_count) ** 2 if iat_count > 0 else 0  
-
-                # Eğer sonuç çok küçük bir negatif sayıysa 0 kabul et
-                safe_variance = max(0, variance_input)
+                dur_in_seconds = raw_data['duration'] / 1000000.0 if raw_data['duration'] > 0 else 0.000001
                 
                 # Özellikleri hesapla
                 processed_data = {
                     'flow_id': raw_data['flow_id'],
-                    'flow_iat_min': raw_data['min_iat'],
-                    'flow_iat_max': raw_data['max_iat'],
-                    'flow_iat_mean': raw_data['iat_sum'] / iat_count if iat_count > 0 else 0,
-                    'flow_iat_std': safe_variance ** 0.5,
-                    'rate_ratio': (raw_data['fwd_count'] / raw_data['bwd_count']) if raw_data['bwd_count'] > 0 else raw_data['fwd_count'] / 5,
-                    #protocol': raw_data['protocol'],
-                    'max_packet_length': raw_data['max_packet_size'],
-                    'min_packet_length': raw_data['min_packet_size'],
-                    'packet_length_mean': raw_data['packet_size_sum'] / (raw_data['fwd_count'] + raw_data['bwd_count']) if (raw_data['fwd_count'] + raw_data['bwd_count']) > 0 else 0
+                    'first_ip': str(ipaddress.IPv4Address(raw_data['first_ip'])),
+                    'second_ip': str(ipaddress.IPv4Address(raw_data['second_ip'])),
+                    'firstPort': raw_data['src_port'],
+                    'secondPort': raw_data['dst_port'],
+                    'N_IN_Conn_P_DstIP': 0, # Placeholder, gerçek hesaplama eklenmeli
+                    'TnP_PDstIP': 0, # Placeholder, gerçek hesaplama eklenmeli,
+                    'fwd_count': raw_data['fwd_count'],
+                    'bwd_count': raw_data['bwd_count'],
+                    'Srate': raw_data['fwd_count'] / dur_in_seconds,
+                    'Drate': raw_data['bwd_count'] / dur_in_seconds,
+                    'Dur': dur_in_seconds,
+                    'Bytes': raw_data['packet_size_sum'],
+                    'proto_number': raw_data['protocol']
                 }
                 
-                feature = {
-                    'flow_id': processed_data['flow_id'],
-                    'features': [
-                        processed_data['flow_iat_min'],
-                        processed_data['flow_iat_max'],
-                        processed_data['flow_iat_mean'],
-                        processed_data['flow_iat_std'],
-                        processed_data['rate_ratio'],
-                        #processed_data['protocol'],
-                        processed_data['max_packet_length'],
-                        processed_data['min_packet_length'],
-                        processed_data['packet_length_mean']
+
+                features = [
+                        processed_data['flow_id'],
+                        processed_data['first_ip'],
+                        processed_data['second_ip'],
+                        processed_data['firstPort'],
+                        processed_data['secondPort'], 
+                        processed_data['fwd_count'],
+                        processed_data['bwd_count'],
+                        processed_data['N_IN_Conn_P_DstIP'],
+                        processed_data['TnP_PDstIP'],
+                        processed_data['Srate'],
+                        processed_data['Drate'],
+                        processed_data['Dur'],
+                        processed_data['Bytes'],
+                        processed_data['proto_number']
                     ]
-                }
                 
-                feature['features'] = pd.DataFrame([feature['features']], columns=colnames)
-                
-                # print(f"--- Feature alindi: {feature['flow_id']} ---")
-                
-                
-                try:
-                    self.controller.q_feature.put(feature, block=False)
-                except:
-                    # Kuyruk doluysa en eski veriyi atmak için mantık eklenebilir
-                    pass            
+                self.controller.features_list.append(features)
+                # if len(self.controller.features_list) >= self.controller.BATCH_SIZE:  # Belirli bir sayıya ulaşıldığında CSV'ye yaz
+                #     write_to_csv(self.controller.features_list, colnames)
+                #     self.controller.features_list.clear()  # Listeyi temizle
+                print(f"--- Feature alindi: {processed_data['flow_id']} ---")
+            
             except Exception as e:
                 print(f"Feature Extraction Hatası: {e}")
                 time.sleep(1) # Hata durumunda döngüyü yavaşlat

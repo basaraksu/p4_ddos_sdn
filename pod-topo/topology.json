@@ -28,7 +28,7 @@
     },
     "switches": {
         "s1": {
-            "cpu_port": 64
+            "runtime_json": "s1-runtime.json"
         }
     },
     "links": [
