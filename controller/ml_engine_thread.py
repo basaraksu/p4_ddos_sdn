@@ -45,8 +45,9 @@ class MLEngineThread(threading.Thread):
             df['TnP_PDstIP'] = df.groupby('secondIp')['fwd_count'].transform('sum')
             
             # CSV'ye yazma
-            is_file_new = os.path.exists("features.csv")
-            df.to_csv("features.csv", mode='a', header=not is_file_new, index=False)
+            filename = f'features_{self.switch.name}.csv'
+            is_file_new = os.path.exists(filename)
+            df.to_csv(filename, mode='a', header=not is_file_new, index=False)
             
             print(f"--- [ML ENGINE] {len(df)} adet akis islendi ve CSV'ye yazildi. ---")
             

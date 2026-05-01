@@ -26,7 +26,12 @@ NUMOFPORTS = 3
 
 
 class DDoSController:
-    def __init__(self):
+    def __init__(self, switch_name='s1', grpc_port=50051, device_id=0):
+        self.switch_name = switch_name
+        self.grpc_port = grpc_port
+        self.device_id = device_id
+        
+        
         self.p4info_file = "../build/ddos_detection.p4.p4info.txtpb"
         self.bmv2_json = "../build/ddos_detection.json"
         self.ip_mac_port_dict = {}  # IP-MAC-Port bilgilerini tutacak sözlük
@@ -38,9 +43,9 @@ class DDoSController:
         self.p4info_helper = None
         
         self.q_digest = queue.Queue()  # Digest verilerini tutacak kuyruk
-        self.q_feature = queue.Queue()  # İşlenmiş özellikleri tutacak kuyruk
+        #self.q_feature = queue.Queue()  # İşlenmiş özellikleri tutacak kuyruk
         self.features_list = []  # İşlenmiş özellikleri geçici olarak tutacak liste
-        self.BATCH_SIZE = 10  # CSV'ye yazmadan önce biriktirilecek özellik sayısı
+        #self.BATCH_SIZE = 10  # CSV'ye yazmadan önce biriktirilecek özellik sayısı
         
     ...
     
@@ -50,9 +55,9 @@ class DDoSController:
 
         # Switch baglantisini kur
         self.switch = p4runtime_lib.bmv2.Bmv2SwitchConnection(
-            name='s1',
-            address='127.0.0.1:50051',
-            device_id=0)
+            name=self.switch_name,
+            address=f'127.0.0.1:{self.grpc_port}',
+            device_id=self.device_id)
 
         self.switch.MasterArbitrationUpdate()
         # self.switch.SetForwardingPipelineConfig(
