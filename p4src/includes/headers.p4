@@ -81,8 +81,8 @@ struct flow_features_t {
     bit<32> flow_id;
     bit<32> first_ip;
     bit<32> second_ip;
-    bit<16> src_port;
-    bit<16> dst_port;
+    bit<16> first_port;
+    bit<16> second_port;
     bit<8> protocol;
     bit<64> fwd_count;
     bit<64> bwd_count;
@@ -95,8 +95,8 @@ struct metadata {
     bit<32> flow_id;
     bit<32> first_ip;
     bit<32> second_ip;
-    bit<16> src_port;
-    bit<16> dst_port;
+    bit<16> first_port;
+    bit<16> second_port;
     bit<8> protocol;
 }
 struct headers{

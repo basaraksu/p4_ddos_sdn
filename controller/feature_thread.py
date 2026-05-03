@@ -7,14 +7,13 @@ from helper import write_to_csv
 import ipaddress
 
 class FeatureThread(threading.Thread):
-    def __init__(self, switch, controller, daemon=True):
+    def __init__(self, controller, daemon=True):
         super().__init__(daemon=daemon)
-        self.switch = switch
         self.controller = controller
         
         
     def run(self):
-        print(f"--- {self.switch.name} Feature verileri dinleniyor... ---")
+        print(f"--- {self.controller.name} Feature verileri dinleniyor... ---")
         while True:
             try:
                 # Feature mesajını al
@@ -26,23 +25,23 @@ class FeatureThread(threading.Thread):
                 # digestten gelen raw_data
                 # flow_id, first_ip, second_ip, src_port, dst_port, protocol, fwd_count, bwd_count, packet_size_sum, duration, iat_sum, iat_sum_square, min_iat, max_iat
                 
-                colnames = ['flow_id', 'firstIp', 'secondIp', 'firstPort', 'secondPort', 'fwd_count', 'bwd_count', 'N_IN_Conn_P_DstIP', 'TnP_PDstIP', 'Srate', 'Drate', 'Dur', 'Bytes', 'proto_number']
+                colnames = ['flow_id','switch_name','controller_name', 'firstIp', 'secondIp', 'firstPort', 'secondPort', 'fwd_count', 'bwd_count', 'N_IN_Conn_P_DstIP', 'TnP_PDstIP', 'Srate', 'Drate', 'Dur', 'Bytes', 'proto_number']
                 
-                dur_in_seconds = raw_data['duration'] / 1000000.0 if raw_data['duration'] > 0 else 0.000001
+                dur_in_seconds = raw_data['duration'] / 1000000.0
                 
                 # Özellikleri hesapla
                 processed_data = {
                     'flow_id': raw_data['flow_id'],
+                    'switch_name': raw_data['switch_name'],
+                    'controller_name': self.controller.name,
                     'first_ip': str(ipaddress.IPv4Address(raw_data['first_ip'])),
                     'second_ip': str(ipaddress.IPv4Address(raw_data['second_ip'])),
-                    'firstPort': raw_data['src_port'],
-                    'secondPort': raw_data['dst_port'],
-                    'N_IN_Conn_P_DstIP': 0, # Placeholder, gerçek hesaplama eklenmeli
-                    'TnP_PDstIP': 0, # Placeholder, gerçek hesaplama eklenmeli,
+                    'firstPort': raw_data['first_port'],
+                    'secondPort': raw_data['second_port'],
                     'fwd_count': raw_data['fwd_count'],
                     'bwd_count': raw_data['bwd_count'],
-                    'Srate': raw_data['fwd_count'] / dur_in_seconds,
-                    'Drate': raw_data['bwd_count'] / dur_in_seconds,
+                    'Srate': raw_data['fwd_count'] / dur_in_seconds if dur_in_seconds > 0 else 0,
+                    'Drate': raw_data['bwd_count'] / dur_in_seconds if dur_in_seconds > 0 else 0,
                     'Dur': dur_in_seconds,
                     'Bytes': raw_data['packet_size_sum'],
                     'proto_number': raw_data['protocol']
@@ -51,14 +50,14 @@ class FeatureThread(threading.Thread):
 
                 features = [
                         processed_data['flow_id'],
+                        processed_data['switch_name'],
+                        processed_data['controller_name'],
                         processed_data['first_ip'],
                         processed_data['second_ip'],
                         processed_data['firstPort'],
                         processed_data['secondPort'], 
                         processed_data['fwd_count'],
                         processed_data['bwd_count'],
-                        processed_data['N_IN_Conn_P_DstIP'],
-                        processed_data['TnP_PDstIP'],
                         processed_data['Srate'],
                         processed_data['Drate'],
                         processed_data['Dur'],
@@ -66,11 +65,12 @@ class FeatureThread(threading.Thread):
                         processed_data['proto_number']
                     ]
                 
-                self.controller.features_list.append(features)
+                with self.controller.features_list_lock:
+                    self.controller.features_list.append(features)
                 # if len(self.controller.features_list) >= self.controller.BATCH_SIZE:  # Belirli bir sayıya ulaşıldığında CSV'ye yaz
                 #     write_to_csv(self.controller.features_list, colnames)
                 #     self.controller.features_list.clear()  # Listeyi temizle
-                print(f"--- Feature alindi: {processed_data['flow_id']} ---")
+                #print(f"--- Feature alindi: {processed_data['flow_id']} ---")
             
             except Exception as e:
                 print(f"Feature Extraction Hatası: {e}")

@@ -8,7 +8,7 @@ from controller import DDoSController
 
 def main():
     print("=====================================================")
-    print("  DAĞITIK SDN KONTROLCÜ KÜMESİ BAŞLATILIYOR (SCENARIO 2)")
+    print("  DAĞITIK SDN KONTROLCÜ KÜMESİ BAŞLATILIYOR (SCENARIO 1)")
     print("=====================================================")
     
     # ---------------------------------------------------------

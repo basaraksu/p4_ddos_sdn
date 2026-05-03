@@ -1,0 +1,242 @@
+{
+    "hosts": {
+        "h1": {
+            "ip": "10.0.1.1/24",
+            "mac": "08:00:00:00:01:01",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.1.10 dev eth0",
+                "arp -i eth0 -s 10.0.1.10 08:00:00:00:01:00",
+                "bash -c '(while true; do echo \"s1\"; sleep 1; done) | nc -u 10.0.5.12 5000 &' "
+            ]
+        },
+        "h2": {
+            "ip": "10.0.1.2/24",
+            "mac": "08:00:00:00:01:02",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.1.10 dev eth0",
+                "arp -i eth0 -s 10.0.1.10 08:00:00:00:01:00",
+                "bash -c '(while true; do echo \"s1_sensor\"; sleep 2; done) | nc -u 10.0.5.12 5001 &' "
+            ]
+        },
+        "h3": {
+            "ip": "10.0.1.3/24",
+            "mac": "08:00:00:00:01:03",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.1.10 dev eth0",
+                "arp -i eth0 -s 10.0.1.10 08:00:00:00:01:00",
+                "bash -c '(while true; do ping -c 1 10.0.5.11; sleep 5; done) &' "
+            ]
+        },
+        "h4": {
+            "ip": "10.0.2.4/24",
+            "mac": "08:00:00:00:02:04",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.2.10 dev eth0",
+                "arp -i eth0 -s 10.0.2.10 08:00:00:00:02:00",
+                "iperf3 -c 10.0.5.12 -u -b 1M -t 3600 &"
+            ]
+        },
+        "h5": {
+            "ip": "10.0.2.5/24",
+            "mac": "08:00:00:00:02:05",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.2.10 dev eth0",
+                "arp -i eth0 -s 10.0.2.10 08:00:00:00:02:00"
+            ]
+        },
+        "h6": {
+            "ip": "10.0.3.6/24",
+            "mac": "08:00:00:00:03:06",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.3.10 dev eth0",
+                "arp -i eth0 -s 10.0.3.10 08:00:00:00:03:00",
+                "bash -c 'while true; do iperf3 -c 10.0.5.11 -b 5M -t 60; sleep 10; done' &"
+            ]
+        },
+        "h7": {
+            "ip": "10.0.3.7/24",
+            "mac": "08:00:00:00:03:07",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.3.10 dev eth0",
+                "arp -i eth0 -s 10.0.3.10 08:00:00:00:03:00",
+                "bash -c 'while true; do curl -s http://10.0.5.11 > /dev/null; sleep $((RANDOM % 5 + 1)); done' &"
+            ]
+        },
+        "h8": {
+            "ip": "10.0.4.8/24",
+            "mac": "08:00:00:00:04:08",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.4.10 dev eth0",
+                "arp -i eth0 -s 10.0.4.10 08:00:00:00:04:00",
+                "bash -c 'while true; do iperf3 -c 10.0.5.11 -b 2M -t 120; sleep 20; done' &"
+            ]
+        },
+        "h9": {
+            "ip": "10.0.4.9/24",
+            "mac": "08:00:00:00:04:09",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.4.10 dev eth0",
+                "arp -i eth0 -s 10.0.4.10 08:00:00:00:04:00",
+                "bash -c 'while true; do head -c 50 /dev/urandom | nc 10.0.5.11 80; sleep 2; done' &"
+            ]
+        },
+        "h10": {
+            "ip": "10.0.4.10/24",
+            "mac": "08:00:00:00:04:10",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.4.10 dev eth0",
+                "arp -i eth0 -s 10.0.4.10 08:00:00:00:04:00"
+            ]
+        },
+        "h11": {
+            "ip": "10.0.5.11/24",
+            "mac": "08:00:00:00:05:11",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.5.10 dev eth0",
+                "arp -i eth0 -s 10.0.5.10 08:00:00:00:05:00",
+                "python3 -m http.server 80 &",
+                "iperf3 -s &"
+            ]
+        },
+        "h12": {
+            "ip": "10.0.5.12/24",
+            "mac": "08:00:00:00:05:12",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.5.10 dev eth0",
+                "arp -i eth0 -s 10.0.5.10 08:00:00:00:05:00",
+                "iperf3 -s &",
+                "bash -c 'while true; do nc -ul -p 5000 > /dev/null; done' &",
+                "bash -c 'while true; do nc -ul -p 5001 > /dev/null; done' &",
+                "bash -c 'while true; do nc -ul -p 5002 > /dev/null; done' &",
+                "bash -c 'while true; do nc -ul -p 6000 > /dev/null; done' &"
+            ]
+        },
+        "h13": {
+            "ip": "10.0.5.13/24",
+            "mac": "08:00:00:00:05:13",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.5.10 dev eth0",
+                "arp -i eth0 -s 10.0.5.10 08:00:00:00:05:00"
+            ]
+        },
+        "h14": {
+            "ip": "10.0.1.14/24",
+            "mac": "08:00:00:00:01:14",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.1.10 dev eth0",
+                "arp -i eth0 -s 10.0.1.10 08:00:00:00:01:00",
+                "bash -c 'while true; do echo \"temp_sensor_data\" | nc -u 10.0.5.12 6000; sleep $((RANDOM % 10 + 5)); done' &"
+            ]
+        },
+        "h15": {
+            "ip": "10.0.2.15/24",
+            "mac": "08:00:00:00:02:15",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.2.10 dev eth0",
+                "arp -i eth0 -s 10.0.2.10 08:00:00:00:02:00",
+                "bash -c 'while true; do wget -qO- http://10.0.5.11/test.html > /dev/null; sleep $((RANDOM % 15 + 10)); done' &"
+            ]
+        },
+        "h16": {
+            "ip": "10.0.3.16/24",
+            "mac": "08:00:00:00:03:16",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.3.10 dev eth0",
+                "arp -i eth0 -s 10.0.3.10 08:00:00:00:03:00",
+                "bash -c 'while true; do ping -c 3 10.0.5.13; sleep $((RANDOM % 20 + 5)); done' &"
+            ]
+        },
+        "h17": {
+            "ip": "10.0.4.17/24",
+            "mac": "08:00:00:00:04:17",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.4.10 dev eth0",
+                "arp -i eth0 -s 10.0.4.10 08:00:00:00:04:00",
+                "iperf3 -c 10.0.5.11 -t 3600 -b 500k &"
+            ]
+        },
+        "h18": {
+            "ip": "10.0.1.18/24",
+            "mac": "08:00:00:00:01:18",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.1.10 dev eth0",
+                "arp -i eth0 -s 10.0.1.10 08:00:00:00:01:00",
+                "bash -c 'while true; do echo \"gas_level_alert\" | nc -w1 10.0.5.11 80; sleep $((RANDOM % 30 + 1)); done' &"
+            ]
+        },
+        "h19": {
+            "ip": "10.0.2.19/24",
+            "mac": "08:00:00:00:02:19",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.2.10 dev eth0",
+                "arp -i eth0 -s 10.0.2.10 08:00:00:00:02:00",
+                "bash -c 'while true; do dd if=/dev/urandom bs=1k count=10 | nc 10.0.5.12 5002; sleep $((RANDOM % 40 + 20)); done' &"
+            ]
+        },
+        "h20": {
+            "ip": "10.0.5.20/24",
+            "mac": "08:00:00:00:05:20",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.5.10 dev eth0",
+                "arp -i eth0 -s 10.0.5.10 08:00:00:00:05:00"
+            ]
+        }
+    },
+    "switches": {
+        "s1": { "runtime_json": "s1-runtime.json" },
+        "s2": { "runtime_json": "s2-runtime.json" },
+        "s3": { "runtime_json": "s3-runtime.json" },
+        "s4": { "runtime_json": "s4-runtime.json" },
+        "s5": { "runtime_json": "s5-runtime.json" }
+    },
+    "links": [
+        ["h1", "s1-p1"],
+        ["h2", "s1-p2"],
+        ["h3", "s1-p3"],
+        ["h14", "s1-p5"],
+        ["h18", "s1-p6"],
+        ["s1-p4", "s5-p1"],
+        
+        ["h4", "s2-p1"],
+        ["h5", "s2-p2"],
+        ["h15", "s2-p4"],
+        ["h19", "s2-p5"],
+        ["s2-p3", "s5-p2"],
+        
+        ["h6", "s3-p1"],
+        ["h7", "s3-p2"],
+        ["h16", "s3-p4"],
+        ["s3-p3", "s5-p3"],
+        
+        ["h8", "s4-p1"],
+        ["h9", "s4-p2"],
+        ["h10", "s4-p3"],
+        ["h17", "s4-p5"],
+        ["s4-p4", "s5-p4"],
+        
+        ["h11", "s5-p5"],
+        ["h12", "s5-p6"],
+        ["h13", "s5-p7"],
+        ["h20", "s5-p8"]
+    ]
+}

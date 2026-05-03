@@ -70,21 +70,32 @@ control MyIngress(inout headers hdr, inout metadata meta, inout standard_metadat
             bit<64> packet_size_sum = 0;
     
 
-             // --- PORT ÇEKME MANTIĞI ---
+            // --- PORT ÇEKME MANTIĞI (Geçici Meta Değişkenlerine Al) ---
+            bit<16> temp_src_port = 0;
+            bit<16> temp_dst_port = 0;
+
             if (hdr.tcp.isValid()) {
-                meta.src_port = hdr.tcp.srcPort; meta.dst_port = hdr.tcp.dstPort;
+                temp_src_port = hdr.tcp.srcPort; 
+                temp_dst_port = hdr.tcp.dstPort;
             } else if (hdr.udp.isValid()) {
-                meta.src_port = hdr.udp.srcPort; meta.dst_port = hdr.udp.dstPort;
-            }  else {
-                meta.src_port = 0; meta.dst_port = 0; // ICMP vb. için portları sıfırla
-            }
+                temp_src_port = hdr.udp.srcPort; 
+                temp_dst_port = hdr.udp.dstPort;
+            } 
+            // ICMP vb. için zaten 0 kalacak.
 
-
-            // --- SYMMETRIC KEY SIRALAMA ---
+            // --- SYMMETRIC KEY SIRALAMA (IP ve PORT BİRLİKTE) ---
             if (hdr.ipv4.srcAddr < hdr.ipv4.dstAddr) {
-                meta.first_ip = hdr.ipv4.srcAddr; meta.second_ip = hdr.ipv4.dstAddr;
+                // IP'ler sıralıysa, Portlar da kendi sırasında kalır
+                meta.first_ip = hdr.ipv4.srcAddr; 
+                meta.second_ip = hdr.ipv4.dstAddr;
+                meta.first_port = temp_src_port; 
+                meta.second_port = temp_dst_port;
             } else {
-                meta.first_ip = hdr.ipv4.dstAddr; meta.second_ip = hdr.ipv4.srcAddr;
+                // IP'ler yer değiştiriyorsa, PORTLAR DA YER DEĞİŞTİRMELİ!
+                meta.first_ip = hdr.ipv4.dstAddr; 
+                meta.second_ip = hdr.ipv4.srcAddr;
+                meta.first_port = temp_dst_port;   // DİKKAT: Çapraz atama yapıyoruz
+                meta.second_port = temp_src_port;  // DİKKAT: Çapraz atama yapıyoruz
             }
 
             // --- FLOW ID HESAPLAMA ---
@@ -93,8 +104,8 @@ control MyIngress(inout headers hdr, inout metadata meta, inout standard_metadat
                 { 
                     meta.first_ip, 
                     meta.second_ip, 
-                    meta.src_port, 
-                    meta.dst_port, 
+                    meta.first_port, 
+                    meta.second_port, 
                     hdr.ipv4.protocol 
                 }, 
                 (bit<32>)65536);
@@ -107,6 +118,26 @@ control MyIngress(inout headers hdr, inout metadata meta, inout standard_metadat
                 flow_is_active.write(meta.flow_id, 1);
                 first_seen = standard_metadata.ingress_global_timestamp;
                 flow_packet_first_seen.write(meta.flow_id, first_seen);  
+
+                // --- İLK PAKET ANINDA BİLDİRİMİ (SPOOFING YAKALAYICI) ---
+                // Yeni bir IP gördüğümüz anda Python'a "Böyle bir şey geldi" diyoruz.
+                meta.stats.flow_id = meta.flow_id;
+                meta.stats.first_ip = meta.first_ip;
+                meta.stats.second_ip = meta.second_ip;
+                meta.stats.first_port = meta.first_port;
+                meta.stats.second_port = meta.second_port;
+                meta.stats.protocol = hdr.ipv4.protocol;
+                // YÖNÜ DİNAMİK OLARAK BELİRLE!
+                if (hdr.ipv4.srcAddr == meta.first_ip) {
+                    meta.stats.fwd_count = 1;
+                    meta.stats.bwd_count = 0;
+                } else {
+                    meta.stats.fwd_count = 0;
+                    meta.stats.bwd_count = 1;
+                }
+                meta.stats.packet_size_sum = current_packet_size;
+                meta.stats.duration = 0; // Henüz süre geçmedi
+                digest(388632363, meta.stats);
             }
             else {
                 flow_packet_first_seen.read(first_seen, meta.flow_id);
@@ -148,8 +179,8 @@ control MyIngress(inout headers hdr, inout metadata meta, inout standard_metadat
                 meta.stats.flow_id = meta.flow_id;
                 meta.stats.first_ip = meta.first_ip;
                 meta.stats.second_ip = meta.second_ip;
-                meta.stats.src_port = meta.src_port;
-                meta.stats.dst_port = meta.dst_port;
+                meta.stats.first_port = meta.first_port;
+                meta.stats.second_port = meta.second_port;
                 meta.stats.protocol = hdr.ipv4.protocol;
                 meta.stats.fwd_count = fwd_count;
                 meta.stats.bwd_count = bwd_count;
