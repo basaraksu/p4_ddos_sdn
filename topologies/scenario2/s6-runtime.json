@@ -1,0 +1,91 @@
+{
+    "target": "bmv2",
+    "p4info": "build/ddos_detection.p4.p4info.txtpb",
+    "bmv2_json": "build/ddos_detection.json",
+    "table_entries": [
+        {
+            "table": "MyIngress.ipv4_lpm",
+            "match": {
+                "hdr.ipv4.dstAddr": [
+                    "10.0.6.1",
+                    32
+                ]
+            },
+            "action_name": "MyIngress.ipv4_forward",
+            "action_params": {
+                "dstAddr": "08:00:00:00:06:01",
+                "port": 2
+            }
+        },
+        {
+            "table": "MyIngress.ipv4_lpm",
+            "match": {
+                "hdr.ipv4.dstAddr": [
+                    "10.0.6.2",
+                    32
+                ]
+            },
+            "action_name": "MyIngress.ipv4_forward",
+            "action_params": {
+                "dstAddr": "08:00:00:00:06:02",
+                "port": 3
+            }
+        },
+        {
+            "table": "MyIngress.ipv4_lpm",
+            "match": {
+                "hdr.ipv4.dstAddr": [
+                    "10.0.6.3",
+                    32
+                ]
+            },
+            "action_name": "MyIngress.ipv4_forward",
+            "action_params": {
+                "dstAddr": "08:00:00:00:06:03",
+                "port": 4
+            }
+        },
+        {
+            "table": "MyIngress.ipv4_lpm",
+            "match": {
+                "hdr.ipv4.dstAddr": [
+                    "10.0.6.4",
+                    32
+                ]
+            },
+            "action_name": "MyIngress.ipv4_forward",
+            "action_params": {
+                "dstAddr": "08:00:00:00:06:04",
+                "port": 5
+            }
+        },
+        {
+            "table": "MyIngress.ipv4_lpm",
+            "match": {
+                "hdr.ipv4.dstAddr": [
+                    "10.0.6.5",
+                    32
+                ]
+            },
+            "action_name": "MyIngress.ipv4_forward",
+            "action_params": {
+                "dstAddr": "08:00:00:00:06:05",
+                "port": 6
+            }
+        },
+        {
+            "table": "MyIngress.ipv4_lpm",
+            "match": {
+                "hdr.ipv4.dstAddr": [
+                    "10.0.0.0",
+                    8
+                ]
+            },
+            "action_name": "MyIngress.ipv4_forward",
+            "action_params": {
+                "dstAddr": "08:00:00:00:06:00",
+                "port": 1
+            }
+        }
+    ]
+}

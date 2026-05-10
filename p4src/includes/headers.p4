@@ -84,8 +84,8 @@ struct flow_features_t {
     bit<16> first_port;
     bit<16> second_port;
     bit<8> protocol;
-    bit<64> fwd_count;
-    bit<64> bwd_count;
+    bit<64> first_count;
+    bit<64> second_count;
     bit<64> packet_size_sum;
     bit<64> duration;
 }

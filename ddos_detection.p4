@@ -12,8 +12,8 @@ control MyVerifyChecksum(inout headers hdr, inout metadata meta) { apply { } }
 
 
 // Her akışın paket sayısını tutan hafıza (Forward ve Backward için ayrı)
-register<bit<64>>(65536) flow_packet_count_fwd; 
-register<bit<64>>(65536) flow_packet_count_bwd;
+register<bit<64>>(65536) flow_packet_count_first; 
+register<bit<64>>(65536) flow_packet_count_second;
 
 
 register<bit<48>>(65536) flow_packet_first_seen;
@@ -63,7 +63,7 @@ control MyIngress(inout headers hdr, inout metadata meta, inout standard_metadat
 
         if (hdr.ipv4.isValid()) {
 
-            bit<64> fwd_count = 0; bit<64> bwd_count = 0; bit<48> first_seen = 0; // bit<48> last_seen = 0;
+            bit<64> first_count = 0; bit<64> second_count = 0; bit<48> first_seen = 0; // bit<48> last_seen = 0;
             bit<48> current_time = standard_metadata.ingress_global_timestamp;
             bit<1> is_active = 0;
             bit<64> current_packet_size = (bit<64>)standard_metadata.packet_length;
@@ -129,11 +129,11 @@ control MyIngress(inout headers hdr, inout metadata meta, inout standard_metadat
                 meta.stats.protocol = hdr.ipv4.protocol;
                 // YÖNÜ DİNAMİK OLARAK BELİRLE!
                 if (hdr.ipv4.srcAddr == meta.first_ip) {
-                    meta.stats.fwd_count = 1;
-                    meta.stats.bwd_count = 0;
+                    meta.stats.first_count = 1;
+                    meta.stats.second_count = 0;
                 } else {
-                    meta.stats.fwd_count = 0;
-                    meta.stats.bwd_count = 1;
+                    meta.stats.first_count = 0;
+                    meta.stats.second_count = 1;
                 }
                 meta.stats.packet_size_sum = current_packet_size;
                 meta.stats.duration = 0; // Henüz süre geçmedi
@@ -150,11 +150,11 @@ control MyIngress(inout headers hdr, inout metadata meta, inout standard_metadat
 
             // --- İSTATİSTİK KAYIT ---
             if (hdr.ipv4.srcAddr == meta.first_ip) {
-                flow_packet_count_fwd.read(fwd_count, meta.flow_id);
-                flow_packet_count_fwd.write(meta.flow_id, fwd_count + 1);
+                flow_packet_count_first.read(first_count, meta.flow_id);
+                flow_packet_count_first.write(meta.flow_id, first_count + 1);
             } else {
-                flow_packet_count_bwd.read(bwd_count, meta.flow_id);
-                flow_packet_count_bwd.write(meta.flow_id, bwd_count + 1);
+                flow_packet_count_second.read(second_count, meta.flow_id);
+                flow_packet_count_second.write(meta.flow_id, second_count + 1);
             }
 
             // // --- PAKET BOYUTU İSTATİSTİKLERİ ---
@@ -173,8 +173,8 @@ control MyIngress(inout headers hdr, inout metadata meta, inout standard_metadat
 
             if (current_time - first_seen >= WINDOW_TIME) { // 5 saniyeden büyükse
             
-                flow_packet_count_fwd.read(fwd_count, meta.flow_id);
-                flow_packet_count_bwd.read(bwd_count, meta.flow_id);
+                flow_packet_count_first.read(first_count, meta.flow_id);
+                flow_packet_count_second.read(second_count, meta.flow_id);
                 // digest flow
                 meta.stats.flow_id = meta.flow_id;
                 meta.stats.first_ip = meta.first_ip;
@@ -182,15 +182,15 @@ control MyIngress(inout headers hdr, inout metadata meta, inout standard_metadat
                 meta.stats.first_port = meta.first_port;
                 meta.stats.second_port = meta.second_port;
                 meta.stats.protocol = hdr.ipv4.protocol;
-                meta.stats.fwd_count = fwd_count;
-                meta.stats.bwd_count = bwd_count;
+                meta.stats.first_count = first_count;
+                meta.stats.second_count = second_count;
                 meta.stats.packet_size_sum = packet_size_sum + current_packet_size;
                 meta.stats.duration = (bit<64>)(current_time - first_seen);
                 digest(388632363, meta.stats); // Controller'a gönder
 
                 //registerları sıfırla
-                flow_packet_count_fwd.write(meta.flow_id, 0);
-                flow_packet_count_bwd.write(meta.flow_id, 0);
+                flow_packet_count_first.write(meta.flow_id, 0);
+                flow_packet_count_second.write(meta.flow_id, 0);
                 flow_packet_first_seen.write(meta.flow_id, 0);
                 flow_packet_last_seen.write(meta.flow_id, 0);
                 flow_packet_packet_size_sum.write(meta.flow_id, 0);

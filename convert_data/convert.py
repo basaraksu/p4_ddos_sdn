@@ -37,13 +37,18 @@ known_ips = set(whitelist_ips + blocklist_ips)
 def label_traffic(row):
     first_ip = row['firstIp']
     second_ip = row['secondIp']
-    fwd_count = row['fwd_count']
-    bwd_count = row['bwd_count']
-    
+    first_count = row['first_count']
+    second_count = row['second_count']
+
     # Kural 1: Eğer firstIp blocklist'te ise (Non-Spoofed saldırgan başlatıyor) -> Saldırı (1)
-    if first_ip in blocklist_ips:
-        return 1
-        
+    if first_ip in blocklist_ips or second_ip in blocklist_ips:
+        if first_ip in blocklist_ips and first_count > second_count:
+            return 1
+        elif second_ip in blocklist_ips and second_count > first_count:
+            return 1
+        else:
+            return 0
+
     # IP'lerin random (spoofed) olup olmadığını kontrol et
     is_first_random = first_ip not in known_ips
     is_second_random = second_ip not in known_ips
@@ -51,10 +56,10 @@ def label_traffic(row):
     # Kural 2: Eğer IP'lerden en az biri random (spoofed) ise
     if is_first_random or is_second_random:
         # firstIp random iken ileri yönde paket varsa -> Saldırı (1)
-        if is_first_random and fwd_count > 0:
+        if is_first_random and first_count > second_count:
             return 1
         # secondIp random iken geri yönde paket varsa -> Saldırı (1)
-        elif is_second_random and bwd_count > 0:
+        elif is_second_random and second_count > first_count:
             return 1
         # Diğer durumlar (örneğin kurbanın random IP'ye verdiği yanıt trafikleri) -> Normal (0)
         else:

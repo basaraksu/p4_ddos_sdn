@@ -31,6 +31,10 @@ cp $SCENARIO_DIR/*.json ./
 echo "-> Senaryo main dosyasi Controller altina yerlestiriliyor..."
 cp $SCENARIO_DIR/main.py ./controller/main.py
 
+# 4. Traffic_gen dosyasını Controller klasörüne kopyala
+echo "-> Senaryo traffic_gen dosyasi root altina yerlestiriliyor..."
+cp $SCENARIO_DIR/traffic_gen.py ./
+
 echo "======================================================"
 echo " BASARILI! Sistem [$1] icin hazir."
 echo " Mininet'i baslatmak icin: make run"

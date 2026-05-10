@@ -24,8 +24,8 @@ class receiveDigest:
                        'first_port': int.from_bytes(members[3].bitstring, 'big'),
                        'second_port': int.from_bytes(members[4].bitstring, 'big'),
                        'protocol': int.from_bytes(members[5].bitstring, 'big'),
-                       'fwd_count': int.from_bytes(members[6].bitstring, 'big'),
-                       'bwd_count': int.from_bytes(members[7].bitstring, 'big'),
+                       'first_count': int.from_bytes(members[6].bitstring, 'big'),
+                       'second_count': int.from_bytes(members[7].bitstring, 'big'),
                        'packet_size_sum': int.from_bytes(members[8].bitstring, 'big'),
                        'duration': int.from_bytes(members[9].bitstring, 'big')
                     }

@@ -12,12 +12,48 @@ class MLEngineThread(threading.Thread):
     def __init__(self, controller, daemon=True):
         super().__init__(daemon=daemon)
         self.controller = controller
-        self.model = joblib.load('../models/my_model.pkl')
+        self.model = joblib.load('../models/my_model_2.pkl')
+        
+    def write_to_csv(self, df):
+        filename = f'../data/{self.controller.csv_file_name}'
+        is_file_new = not os.path.exists(filename)
+        df.to_csv(filename, mode='a', header=is_file_new, index=False)
+        
+    def predict_and_defend(self, df):
+        # Modelin eğitilirken görmediği kimlik sütunlarını çıkarıyoruz
+        features_for_model = df.drop(columns=['flow_id', 'firstIp', 'switch_name', 'controller_name', 'secondIp', 'firstPort', 'secondPort'])
+        
+        # Tahminleri yap ve DataFrame'e ekle (0: Normal, 1: DDoS)
+        predictions = self.model.predict(features_for_model)
+        df['prediction'] = predictions
+
+        # Sadece DDoS olarak işaretlenen (prediction == 1) akışları filtrele
+        ddos_flows = df[df['prediction'] == 1]
+
+        if not ddos_flows.empty:
+            print(f"\n[!!!] {self.controller.name} DİKKAT: {len(ddos_flows)} ADET ŞÜPHELİ DDOS AKIŞI TESPİT EDİLDİ! [!!!]")
+            
+            # Aynı IP çifti birden fazla satır (flow) oluşturmuş olabilir.
+            # Konsolu spamllememek için eşsiz (unique) Saldırgan-Kurban çiftlerini alalım:
+            unique_attackers = ddos_flows[['firstIp', 'secondIp']].drop_duplicates()
+            
+            for index, row in unique_attackers.iterrows():
+                first_ip = row['firstIp']
+                second_ip = row['secondIp']
+                print(f" -> [TEHDİT] First IP: {first_ip} <|> Second IP: {second_ip}")
+                
+                # --- CANLI BLOKLAMA İÇİN YER TUTUCU ---
+                # İleride P4 switch'e kural yazdırmak için burayı aktif edeceksin:
+                # self.controller.add_drop_rule(first_ip)
+        else:
+            print(f"[{self.controller.name}] 5 saniyelik pencerede trafik temiz.") # İsteğe bağlı log
+        del features_for_model
+        del ddos_flows
         
     def run(self):
         print(f"--- {self.controller.name} ML Engine basladi. 5 saniyelik pencerelerle dinleniyor... ---")
         colnames = ['flow_id', 'switch_name', 'controller_name', 'firstIp', 'secondIp', 'firstPort', 'secondPort', 
-                    'fwd_count', 'bwd_count', 'Srate', 'Drate', 'Dur', 'Bytes', 'proto_number']
+                    'first_count', 'second_count', 'first_rate', 'second_rate', 'Dur', 'Bytes', 'proto_number']
                 
         while True:
             time.sleep(5) # 5 saniyelik Micro-Batch penceresi
@@ -35,10 +71,8 @@ class MLEngineThread(threading.Thread):
             # Pandas DF oluşturma
             df = pd.DataFrame(datas, columns=colnames)
             
-            # --- SİMETRİK KÜMÜLATİF HESAPLAMALAR ---
-
+           # --- SİMETRİK KÜMÜLATİF HESAPLAMALAR (IP BAZLI) ---
             # 1. Tüm IP'lerin (hem first hem second) toplam benzersiz bağlantılarını hesaplayalım
-            # Önce IP bazlı bir "harita" oluşturuyoruz
             all_conns = pd.concat([
                 df[['firstIp', 'secondIp']].rename(columns={'firstIp': 'IP', 'secondIp': 'Peer'}),
                 df[['secondIp', 'firstIp']].rename(columns={'secondIp': 'IP', 'firstIp': 'Peer'})
@@ -47,53 +81,32 @@ class MLEngineThread(threading.Thread):
             # Her IP için kaç tane benzersiz 'Peer' (eş) olduğunu bulalım
             conn_counts = all_conns.groupby('IP')['Peer'].nunique().to_dict()
 
-            # 2. Şimdi bu gerçek değerleri ana tablomuza geri yazalım
+            # Gerçek değerleri ana tablomuza geri yazalım
             df['N_Conn_P_FirstIP'] = df['firstIp'].map(conn_counts).fillna(0)
             df['N_Conn_P_SecondIP'] = df['secondIp'].map(conn_counts).fillna(0)
             
-            # # 2. Hedfe gelen toplam paket sayısı
-            # df['TnP_P_SecondIP'] = df.groupby('secondIp')['fwd_count'].transform('sum')
+            # Ortalama Paket Boyutu (1e-6 ile sıfıra bölünme hatası engellenmiş, harika!)
+            df['Avg_Packet_Size'] = df['Bytes'] / (df['first_count'] + df['second_count'] + 1e-6)
+
+            # --- YÖNLÜ KÜMÜLATİF HESAPLAMALAR (PORT BAZLI ZIRH) ---
+            # Her bir Kaynak IP'nin (firstIp) kaç farklı Hedef Porta saldırdığını bul
+            port_counts_first = df.groupby('firstIp')['secondPort'].nunique().to_dict()
+            # Her bir Hedef IP'nin (secondIp) kaç farklı Kaynak Porttan istek aldığını bul
+            port_counts_second = df.groupby('secondIp')['firstPort'].nunique().to_dict()
+
+            # Port değerlerini ana tabloya yazalım
+            df['N_PortP_FirstIp'] = df['firstIp'].map(port_counts_first).fillna(0)
+            df['N_PortP_SecondIp'] = df['secondIp'].map(port_counts_second).fillna(0)
             
-            df['Avg_Packet_Size'] = df['Bytes'] / (df['fwd_count'] + df['bwd_count'] + 1e-6)
-            
-            # # CSV'ye yazma
-            # filename = f'../data/{self.controller.csv_file_name}'
-            # is_file_new = os.path.exists(filename)
-            # df.to_csv(filename, mode='a', header=not is_file_new, index=False)
+            # CSV'ye yazma
+            #self.write_to_csv(df)
             
             #print(f"--- [ML ENGINE] {len(df)} adet akis islendi ve CSV'ye yazildi. ---")
             
-           # --- ML TAHMİNİ VE SAVUNMA TETİKLEME ---
-            # Modelin eğitilirken görmediği kimlik sütunlarını çıkarıyoruz
-            features_for_model = df.drop(columns=['flow_id', 'firstIp', 'switch_name', 'controller_name', 'secondIp', 'firstPort', 'secondPort'])
-            
-            # Tahminleri yap ve DataFrame'e ekle (0: Normal, 1: DDoS)
-            predictions = self.model.predict(features_for_model)
-            df['prediction'] = predictions
-
-            # Sadece DDoS olarak işaretlenen (prediction == 1) akışları filtrele
-            ddos_flows = df[df['prediction'] == 1]
-
-            if not ddos_flows.empty:
-                print(f"\n[!!!] {self.controller.name} DİKKAT: {len(ddos_flows)} ADET ŞÜPHELİ DDOS AKIŞI TESPİT EDİLDİ! [!!!]")
-                
-                # Aynı IP çifti birden fazla satır (flow) oluşturmuş olabilir.
-                # Konsolu spamllememek için eşsiz (unique) Saldırgan-Kurban çiftlerini alalım:
-                unique_attackers = ddos_flows[['firstIp', 'secondIp']].drop_duplicates()
-                
-                for index, row in unique_attackers.iterrows():
-                    first_ip = row['firstIp']
-                    second_ip = row['secondIp']
-                    print(f" -> [TEHDİT] First IP: {first_ip} <|> Second IP: {second_ip}")
-                    
-                    # --- CANLI BLOKLAMA İÇİN YER TUTUCU ---
-                    # İleride P4 switch'e kural yazdırmak için burayı aktif edeceksin:
-                    # self.controller.add_drop_rule(first_ip)
-            else:
-                print(f"[{self.controller.name}] 5 saniyelik pencerede trafik temiz.") # İsteğe bağlı log
+            # --- ML TAHMİNİ VE SAVUNMA TETİKLEME ---
+            self.predict_and_defend(df)
 
             # Memory serbest bırakma (Garbage Collector'a yardım)
-            del features_for_model
-            del ddos_flows
+            
             del df 
             del datas

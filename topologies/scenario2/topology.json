@@ -1,0 +1,1015 @@
+{
+    "hosts": {
+        "h1": {
+            "ip": "10.0.1.1/24",
+            "mac": "08:00:00:00:01:01",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.1.100 dev eth0",
+                "arp -i eth0 -s 10.0.1.100 08:00:00:00:01:00",
+                "arp -i eth0 -s 10.0.1.2 08:00:00:00:01:02",
+                "arp -i eth0 -s 10.0.1.3 08:00:00:00:01:03",
+                "arp -i eth0 -s 10.0.1.4 08:00:00:00:01:04",
+                "arp -i eth0 -s 10.0.1.5 08:00:00:00:01:05",
+                "python3 traffic_gen.py sensor_temp &"
+            ]
+        },
+        "h2": {
+            "ip": "10.0.1.2/24",
+            "mac": "08:00:00:00:01:02",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.1.100 dev eth0",
+                "arp -i eth0 -s 10.0.1.100 08:00:00:00:01:00",
+                "arp -i eth0 -s 10.0.1.1 08:00:00:00:01:01",
+                "arp -i eth0 -s 10.0.1.3 08:00:00:00:01:03",
+                "arp -i eth0 -s 10.0.1.4 08:00:00:00:01:04",
+                "arp -i eth0 -s 10.0.1.5 08:00:00:00:01:05",
+                "python3 traffic_gen.py sensor_temp &"
+            ]
+        },
+        "h3": {
+            "ip": "10.0.1.3/24",
+            "mac": "08:00:00:00:01:03",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.1.100 dev eth0",
+                "arp -i eth0 -s 10.0.1.100 08:00:00:00:01:00",
+                "arp -i eth0 -s 10.0.1.1 08:00:00:00:01:01",
+                "arp -i eth0 -s 10.0.1.2 08:00:00:00:01:02",
+                "arp -i eth0 -s 10.0.1.4 08:00:00:00:01:04",
+                "arp -i eth0 -s 10.0.1.5 08:00:00:00:01:05",
+                "python3 traffic_gen.py sensor_temp &"
+            ]
+        },
+        "h4": {
+            "ip": "10.0.1.4/24",
+            "mac": "08:00:00:00:01:04",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.1.100 dev eth0",
+                "arp -i eth0 -s 10.0.1.100 08:00:00:00:01:00",
+                "arp -i eth0 -s 10.0.1.1 08:00:00:00:01:01",
+                "arp -i eth0 -s 10.0.1.2 08:00:00:00:01:02",
+                "arp -i eth0 -s 10.0.1.3 08:00:00:00:01:03",
+                "arp -i eth0 -s 10.0.1.5 08:00:00:00:01:05",
+                "python3 traffic_gen.py sensor_temp &"
+            ]
+        },
+        "h5": {
+            "ip": "10.0.1.5/24",
+            "mac": "08:00:00:00:01:05",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.1.100 dev eth0",
+                "arp -i eth0 -s 10.0.1.100 08:00:00:00:01:00",
+                "arp -i eth0 -s 10.0.1.1 08:00:00:00:01:01",
+                "arp -i eth0 -s 10.0.1.2 08:00:00:00:01:02",
+                "arp -i eth0 -s 10.0.1.3 08:00:00:00:01:03",
+                "arp -i eth0 -s 10.0.1.4 08:00:00:00:01:04",
+                "python3 traffic_gen.py sensor_gas &"
+            ]
+        },
+        "h6": {
+            "ip": "10.0.2.1/24",
+            "mac": "08:00:00:00:02:01",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.2.100 dev eth0",
+                "arp -i eth0 -s 10.0.2.100 08:00:00:00:02:00",
+                "arp -i eth0 -s 10.0.2.2 08:00:00:00:02:02",
+                "arp -i eth0 -s 10.0.2.3 08:00:00:00:02:03",
+                "arp -i eth0 -s 10.0.2.4 08:00:00:00:02:04",
+                "arp -i eth0 -s 10.0.2.5 08:00:00:00:02:05",
+                "python3 traffic_gen.py sensor_gas &"
+            ]
+        },
+        "h7": {
+            "ip": "10.0.2.2/24",
+            "mac": "08:00:00:00:02:02",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.2.100 dev eth0",
+                "arp -i eth0 -s 10.0.2.100 08:00:00:00:02:00",
+                "arp -i eth0 -s 10.0.2.1 08:00:00:00:02:01",
+                "arp -i eth0 -s 10.0.2.3 08:00:00:00:02:03",
+                "arp -i eth0 -s 10.0.2.4 08:00:00:00:02:04",
+                "arp -i eth0 -s 10.0.2.5 08:00:00:00:02:05",
+                "python3 traffic_gen.py sensor_gas &"
+            ]
+        },
+        "h8": {
+            "ip": "10.0.2.3/24",
+            "mac": "08:00:00:00:02:03",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.2.100 dev eth0",
+                "arp -i eth0 -s 10.0.2.100 08:00:00:00:02:00",
+                "arp -i eth0 -s 10.0.2.1 08:00:00:00:02:01",
+                "arp -i eth0 -s 10.0.2.2 08:00:00:00:02:02",
+                "arp -i eth0 -s 10.0.2.4 08:00:00:00:02:04",
+                "arp -i eth0 -s 10.0.2.5 08:00:00:00:02:05",
+                "python3 traffic_gen.py sensor_gas &"
+            ]
+        },
+        "h9": {
+            "ip": "10.0.2.4/24",
+            "mac": "08:00:00:00:02:04",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.2.100 dev eth0",
+                "arp -i eth0 -s 10.0.2.100 08:00:00:00:02:00",
+                "arp -i eth0 -s 10.0.2.1 08:00:00:00:02:01",
+                "arp -i eth0 -s 10.0.2.2 08:00:00:00:02:02",
+                "arp -i eth0 -s 10.0.2.3 08:00:00:00:02:03",
+                "arp -i eth0 -s 10.0.2.5 08:00:00:00:02:05",
+                "python3 traffic_gen.py sensor_gas &"
+            ]
+        },
+        "h10": {
+            "ip": "10.0.2.5/24",
+            "mac": "08:00:00:00:02:05",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.2.100 dev eth0",
+                "arp -i eth0 -s 10.0.2.100 08:00:00:00:02:00",
+                "arp -i eth0 -s 10.0.2.1 08:00:00:00:02:01",
+                "arp -i eth0 -s 10.0.2.2 08:00:00:00:02:02",
+                "arp -i eth0 -s 10.0.2.3 08:00:00:00:02:03",
+                "arp -i eth0 -s 10.0.2.4 08:00:00:00:02:04"
+            ]
+        },
+        "h11": {
+            "ip": "10.0.3.1/24",
+            "mac": "08:00:00:00:03:01",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.3.100 dev eth0",
+                "arp -i eth0 -s 10.0.3.100 08:00:00:00:03:00",
+                "arp -i eth0 -s 10.0.3.2 08:00:00:00:03:02",
+                "arp -i eth0 -s 10.0.3.3 08:00:00:00:03:03",
+                "arp -i eth0 -s 10.0.3.4 08:00:00:00:03:04",
+                "arp -i eth0 -s 10.0.3.5 08:00:00:00:03:05",
+                "python3 traffic_gen.py human_web &"
+            ]
+        },
+        "h12": {
+            "ip": "10.0.3.2/24",
+            "mac": "08:00:00:00:03:02",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.3.100 dev eth0",
+                "arp -i eth0 -s 10.0.3.100 08:00:00:00:03:00",
+                "arp -i eth0 -s 10.0.3.1 08:00:00:00:03:01",
+                "arp -i eth0 -s 10.0.3.3 08:00:00:00:03:03",
+                "arp -i eth0 -s 10.0.3.4 08:00:00:00:03:04",
+                "arp -i eth0 -s 10.0.3.5 08:00:00:00:03:05",
+                "python3 traffic_gen.py human_web &"
+            ]
+        },
+        "h13": {
+            "ip": "10.0.3.3/24",
+            "mac": "08:00:00:00:03:03",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.3.100 dev eth0",
+                "arp -i eth0 -s 10.0.3.100 08:00:00:00:03:00",
+                "arp -i eth0 -s 10.0.3.1 08:00:00:00:03:01",
+                "arp -i eth0 -s 10.0.3.2 08:00:00:00:03:02",
+                "arp -i eth0 -s 10.0.3.4 08:00:00:00:03:04",
+                "arp -i eth0 -s 10.0.3.5 08:00:00:00:03:05",
+                "python3 traffic_gen.py human_web &"
+            ]
+        },
+        "h14": {
+            "ip": "10.0.3.4/24",
+            "mac": "08:00:00:00:03:04",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.3.100 dev eth0",
+                "arp -i eth0 -s 10.0.3.100 08:00:00:00:03:00",
+                "arp -i eth0 -s 10.0.3.1 08:00:00:00:03:01",
+                "arp -i eth0 -s 10.0.3.2 08:00:00:00:03:02",
+                "arp -i eth0 -s 10.0.3.3 08:00:00:00:03:03",
+                "arp -i eth0 -s 10.0.3.5 08:00:00:00:03:05",
+                "python3 traffic_gen.py human_web &"
+            ]
+        },
+        "h15": {
+            "ip": "10.0.3.5/24",
+            "mac": "08:00:00:00:03:05",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.3.100 dev eth0",
+                "arp -i eth0 -s 10.0.3.100 08:00:00:00:03:00",
+                "arp -i eth0 -s 10.0.3.1 08:00:00:00:03:01",
+                "arp -i eth0 -s 10.0.3.2 08:00:00:00:03:02",
+                "arp -i eth0 -s 10.0.3.3 08:00:00:00:03:03",
+                "arp -i eth0 -s 10.0.3.4 08:00:00:00:03:04",
+                "python3 traffic_gen.py human_web &"
+            ]
+        },
+        "h16": {
+            "ip": "10.0.4.1/24",
+            "mac": "08:00:00:00:04:01",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.4.100 dev eth0",
+                "arp -i eth0 -s 10.0.4.100 08:00:00:00:04:00",
+                "arp -i eth0 -s 10.0.4.2 08:00:00:00:04:02",
+                "arp -i eth0 -s 10.0.4.3 08:00:00:00:04:03",
+                "arp -i eth0 -s 10.0.4.4 08:00:00:00:04:04",
+                "arp -i eth0 -s 10.0.4.5 08:00:00:00:04:05",
+                "python3 traffic_gen.py human_web &"
+            ]
+        },
+        "h17": {
+            "ip": "10.0.4.2/24",
+            "mac": "08:00:00:00:04:02",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.4.100 dev eth0",
+                "arp -i eth0 -s 10.0.4.100 08:00:00:00:04:00",
+                "arp -i eth0 -s 10.0.4.1 08:00:00:00:04:01",
+                "arp -i eth0 -s 10.0.4.3 08:00:00:00:04:03",
+                "arp -i eth0 -s 10.0.4.4 08:00:00:00:04:04",
+                "arp -i eth0 -s 10.0.4.5 08:00:00:00:04:05",
+                "python3 traffic_gen.py camera 10.0.9.2 5017 &"
+            ]
+        },
+        "h18": {
+            "ip": "10.0.4.3/24",
+            "mac": "08:00:00:00:04:03",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.4.100 dev eth0",
+                "arp -i eth0 -s 10.0.4.100 08:00:00:00:04:00",
+                "arp -i eth0 -s 10.0.4.1 08:00:00:00:04:01",
+                "arp -i eth0 -s 10.0.4.2 08:00:00:00:04:02",
+                "arp -i eth0 -s 10.0.4.4 08:00:00:00:04:04",
+                "arp -i eth0 -s 10.0.4.5 08:00:00:00:04:05",
+                "python3 traffic_gen.py camera 10.0.9.2 5018 &"
+            ]
+        },
+        "h19": {
+            "ip": "10.0.4.4/24",
+            "mac": "08:00:00:00:04:04",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.4.100 dev eth0",
+                "arp -i eth0 -s 10.0.4.100 08:00:00:00:04:00",
+                "arp -i eth0 -s 10.0.4.1 08:00:00:00:04:01",
+                "arp -i eth0 -s 10.0.4.2 08:00:00:00:04:02",
+                "arp -i eth0 -s 10.0.4.3 08:00:00:00:04:03",
+                "arp -i eth0 -s 10.0.4.5 08:00:00:00:04:05",
+                "python3 traffic_gen.py camera 10.0.9.2 5019 &"
+            ]
+        },
+        "h20": {
+            "ip": "10.0.4.5/24",
+            "mac": "08:00:00:00:04:05",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.4.100 dev eth0",
+                "arp -i eth0 -s 10.0.4.100 08:00:00:00:04:00",
+                "arp -i eth0 -s 10.0.4.1 08:00:00:00:04:01",
+                "arp -i eth0 -s 10.0.4.2 08:00:00:00:04:02",
+                "arp -i eth0 -s 10.0.4.3 08:00:00:00:04:03",
+                "arp -i eth0 -s 10.0.4.4 08:00:00:00:04:04"
+            ]
+        },
+        "h21": {
+            "ip": "10.0.5.1/24",
+            "mac": "08:00:00:00:05:01",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.5.100 dev eth0",
+                "arp -i eth0 -s 10.0.5.100 08:00:00:00:05:00",
+                "arp -i eth0 -s 10.0.5.2 08:00:00:00:05:02",
+                "arp -i eth0 -s 10.0.5.3 08:00:00:00:05:03",
+                "arp -i eth0 -s 10.0.5.4 08:00:00:00:05:04",
+                "arp -i eth0 -s 10.0.5.5 08:00:00:00:05:05",
+                "python3 traffic_gen.py human_web &"
+            ]
+        },
+        "h22": {
+            "ip": "10.0.5.2/24",
+            "mac": "08:00:00:00:05:02",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.5.100 dev eth0",
+                "arp -i eth0 -s 10.0.5.100 08:00:00:00:05:00",
+                "arp -i eth0 -s 10.0.5.1 08:00:00:00:05:01",
+                "arp -i eth0 -s 10.0.5.3 08:00:00:00:05:03",
+                "arp -i eth0 -s 10.0.5.4 08:00:00:00:05:04",
+                "arp -i eth0 -s 10.0.5.5 08:00:00:00:05:05",
+                "python3 traffic_gen.py human_web &"
+            ]
+        },
+        "h23": {
+            "ip": "10.0.5.3/24",
+            "mac": "08:00:00:00:05:03",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.5.100 dev eth0",
+                "arp -i eth0 -s 10.0.5.100 08:00:00:00:05:00",
+                "arp -i eth0 -s 10.0.5.1 08:00:00:00:05:01",
+                "arp -i eth0 -s 10.0.5.2 08:00:00:00:05:02",
+                "arp -i eth0 -s 10.0.5.4 08:00:00:00:05:04",
+                "arp -i eth0 -s 10.0.5.5 08:00:00:00:05:05",
+                "python3 traffic_gen.py human_web &"
+            ]
+        },
+        "h24": {
+            "ip": "10.0.5.4/24",
+            "mac": "08:00:00:00:05:04",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.5.100 dev eth0",
+                "arp -i eth0 -s 10.0.5.100 08:00:00:00:05:00",
+                "arp -i eth0 -s 10.0.5.1 08:00:00:00:05:01",
+                "arp -i eth0 -s 10.0.5.2 08:00:00:00:05:02",
+                "arp -i eth0 -s 10.0.5.3 08:00:00:00:05:03",
+                "arp -i eth0 -s 10.0.5.5 08:00:00:00:05:05",
+                "python3 traffic_gen.py human_web &"
+            ]
+        },
+        "h25": {
+            "ip": "10.0.5.5/24",
+            "mac": "08:00:00:00:05:05",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.5.100 dev eth0",
+                "arp -i eth0 -s 10.0.5.100 08:00:00:00:05:00",
+                "arp -i eth0 -s 10.0.5.1 08:00:00:00:05:01",
+                "arp -i eth0 -s 10.0.5.2 08:00:00:00:05:02",
+                "arp -i eth0 -s 10.0.5.3 08:00:00:00:05:03",
+                "arp -i eth0 -s 10.0.5.4 08:00:00:00:05:04",
+                "python3 traffic_gen.py human_web &"
+            ]
+        },
+        "h26": {
+            "ip": "10.0.6.1/24",
+            "mac": "08:00:00:00:06:01",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.6.100 dev eth0",
+                "arp -i eth0 -s 10.0.6.100 08:00:00:00:06:00",
+                "arp -i eth0 -s 10.0.6.2 08:00:00:00:06:02",
+                "arp -i eth0 -s 10.0.6.3 08:00:00:00:06:03",
+                "arp -i eth0 -s 10.0.6.4 08:00:00:00:06:04",
+                "arp -i eth0 -s 10.0.6.5 08:00:00:00:06:05",
+                "python3 traffic_gen.py heavy_tcp 10.0.9.1 5026 &"
+            ]
+        },
+        "h27": {
+            "ip": "10.0.6.2/24",
+            "mac": "08:00:00:00:06:02",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.6.100 dev eth0",
+                "arp -i eth0 -s 10.0.6.100 08:00:00:00:06:00",
+                "arp -i eth0 -s 10.0.6.1 08:00:00:00:06:01",
+                "arp -i eth0 -s 10.0.6.3 08:00:00:00:06:03",
+                "arp -i eth0 -s 10.0.6.4 08:00:00:00:06:04",
+                "arp -i eth0 -s 10.0.6.5 08:00:00:00:06:05",
+                "python3 traffic_gen.py heavy_tcp 10.0.9.1 5027 &"
+            ]
+        },
+        "h28": {
+            "ip": "10.0.6.3/24",
+            "mac": "08:00:00:00:06:03",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.6.100 dev eth0",
+                "arp -i eth0 -s 10.0.6.100 08:00:00:00:06:00",
+                "arp -i eth0 -s 10.0.6.1 08:00:00:00:06:01",
+                "arp -i eth0 -s 10.0.6.2 08:00:00:00:06:02",
+                "arp -i eth0 -s 10.0.6.4 08:00:00:00:06:04",
+                "arp -i eth0 -s 10.0.6.5 08:00:00:00:06:05",
+                "python3 traffic_gen.py heavy_tcp 10.0.9.1 5028 &"
+            ]
+        },
+        "h29": {
+            "ip": "10.0.6.4/24",
+            "mac": "08:00:00:00:06:04",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.6.100 dev eth0",
+                "arp -i eth0 -s 10.0.6.100 08:00:00:00:06:00",
+                "arp -i eth0 -s 10.0.6.1 08:00:00:00:06:01",
+                "arp -i eth0 -s 10.0.6.2 08:00:00:00:06:02",
+                "arp -i eth0 -s 10.0.6.3 08:00:00:00:06:03",
+                "arp -i eth0 -s 10.0.6.5 08:00:00:00:06:05",
+                "python3 traffic_gen.py heavy_tcp 10.0.9.1 5029 &"
+            ]
+        },
+        "h30": {
+            "ip": "10.0.6.5/24",
+            "mac": "08:00:00:00:06:05",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.6.100 dev eth0",
+                "arp -i eth0 -s 10.0.6.100 08:00:00:00:06:00",
+                "arp -i eth0 -s 10.0.6.1 08:00:00:00:06:01",
+                "arp -i eth0 -s 10.0.6.2 08:00:00:00:06:02",
+                "arp -i eth0 -s 10.0.6.3 08:00:00:00:06:03",
+                "arp -i eth0 -s 10.0.6.4 08:00:00:00:06:04"
+            ]
+        },
+        "h31": {
+            "ip": "10.0.7.1/24",
+            "mac": "08:00:00:00:07:01",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.7.100 dev eth0",
+                "arp -i eth0 -s 10.0.7.100 08:00:00:00:07:00",
+                "arp -i eth0 -s 10.0.7.2 08:00:00:00:07:02",
+                "arp -i eth0 -s 10.0.7.3 08:00:00:00:07:03",
+                "arp -i eth0 -s 10.0.7.4 08:00:00:00:07:04",
+                "arp -i eth0 -s 10.0.7.5 08:00:00:00:07:05",
+                "python3 traffic_gen.py human_web &"
+            ]
+        },
+        "h32": {
+            "ip": "10.0.7.2/24",
+            "mac": "08:00:00:00:07:02",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.7.100 dev eth0",
+                "arp -i eth0 -s 10.0.7.100 08:00:00:00:07:00",
+                "arp -i eth0 -s 10.0.7.1 08:00:00:00:07:01",
+                "arp -i eth0 -s 10.0.7.3 08:00:00:00:07:03",
+                "arp -i eth0 -s 10.0.7.4 08:00:00:00:07:04",
+                "arp -i eth0 -s 10.0.7.5 08:00:00:00:07:05",
+                "python3 traffic_gen.py human_web &"
+            ]
+        },
+        "h33": {
+            "ip": "10.0.7.3/24",
+            "mac": "08:00:00:00:07:03",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.7.100 dev eth0",
+                "arp -i eth0 -s 10.0.7.100 08:00:00:00:07:00",
+                "arp -i eth0 -s 10.0.7.1 08:00:00:00:07:01",
+                "arp -i eth0 -s 10.0.7.2 08:00:00:00:07:02",
+                "arp -i eth0 -s 10.0.7.4 08:00:00:00:07:04",
+                "arp -i eth0 -s 10.0.7.5 08:00:00:00:07:05",
+                "python3 traffic_gen.py human_web &"
+            ]
+        },
+        "h34": {
+            "ip": "10.0.7.4/24",
+            "mac": "08:00:00:00:07:04",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.7.100 dev eth0",
+                "arp -i eth0 -s 10.0.7.100 08:00:00:00:07:00",
+                "arp -i eth0 -s 10.0.7.1 08:00:00:00:07:01",
+                "arp -i eth0 -s 10.0.7.2 08:00:00:00:07:02",
+                "arp -i eth0 -s 10.0.7.3 08:00:00:00:07:03",
+                "arp -i eth0 -s 10.0.7.5 08:00:00:00:07:05",
+                "python3 traffic_gen.py human_web &"
+            ]
+        },
+        "h35": {
+            "ip": "10.0.7.5/24",
+            "mac": "08:00:00:00:07:05",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.7.100 dev eth0",
+                "arp -i eth0 -s 10.0.7.100 08:00:00:00:07:00",
+                "arp -i eth0 -s 10.0.7.1 08:00:00:00:07:01",
+                "arp -i eth0 -s 10.0.7.2 08:00:00:00:07:02",
+                "arp -i eth0 -s 10.0.7.3 08:00:00:00:07:03",
+                "arp -i eth0 -s 10.0.7.4 08:00:00:00:07:04",
+                "python3 traffic_gen.py human_web &"
+            ]
+        },
+        "h36": {
+            "ip": "10.0.8.1/24",
+            "mac": "08:00:00:00:08:01",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.8.100 dev eth0",
+                "arp -i eth0 -s 10.0.8.100 08:00:00:00:08:00",
+                "arp -i eth0 -s 10.0.8.2 08:00:00:00:08:02",
+                "arp -i eth0 -s 10.0.8.3 08:00:00:00:08:03",
+                "arp -i eth0 -s 10.0.8.4 08:00:00:00:08:04",
+                "arp -i eth0 -s 10.0.8.5 08:00:00:00:08:05",
+                "python3 traffic_gen.py ping_client &"
+            ]
+        },
+        "h37": {
+            "ip": "10.0.8.2/24",
+            "mac": "08:00:00:00:08:02",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.8.100 dev eth0",
+                "arp -i eth0 -s 10.0.8.100 08:00:00:00:08:00",
+                "arp -i eth0 -s 10.0.8.1 08:00:00:00:08:01",
+                "arp -i eth0 -s 10.0.8.3 08:00:00:00:08:03",
+                "arp -i eth0 -s 10.0.8.4 08:00:00:00:08:04",
+                "arp -i eth0 -s 10.0.8.5 08:00:00:00:08:05",
+                "python3 traffic_gen.py ping_client &"
+            ]
+        },
+        "h38": {
+            "ip": "10.0.8.3/24",
+            "mac": "08:00:00:00:08:03",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.8.100 dev eth0",
+                "arp -i eth0 -s 10.0.8.100 08:00:00:00:08:00",
+                "arp -i eth0 -s 10.0.8.1 08:00:00:00:08:01",
+                "arp -i eth0 -s 10.0.8.2 08:00:00:00:08:02",
+                "arp -i eth0 -s 10.0.8.4 08:00:00:00:08:04",
+                "arp -i eth0 -s 10.0.8.5 08:00:00:00:08:05",
+                "python3 traffic_gen.py ping_client &"
+            ]
+        },
+        "h39": {
+            "ip": "10.0.8.4/24",
+            "mac": "08:00:00:00:08:04",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.8.100 dev eth0",
+                "arp -i eth0 -s 10.0.8.100 08:00:00:00:08:00",
+                "arp -i eth0 -s 10.0.8.1 08:00:00:00:08:01",
+                "arp -i eth0 -s 10.0.8.2 08:00:00:00:08:02",
+                "arp -i eth0 -s 10.0.8.3 08:00:00:00:08:03",
+                "arp -i eth0 -s 10.0.8.5 08:00:00:00:08:05",
+                "python3 traffic_gen.py ping_client &"
+            ]
+        },
+        "h40": {
+            "ip": "10.0.8.5/24",
+            "mac": "08:00:00:00:08:05",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.8.100 dev eth0",
+                "arp -i eth0 -s 10.0.8.100 08:00:00:00:08:00",
+                "arp -i eth0 -s 10.0.8.1 08:00:00:00:08:01",
+                "arp -i eth0 -s 10.0.8.2 08:00:00:00:08:02",
+                "arp -i eth0 -s 10.0.8.3 08:00:00:00:08:03",
+                "arp -i eth0 -s 10.0.8.4 08:00:00:00:08:04"
+            ]
+        },
+        "h41": {
+            "ip": "10.0.9.1/24",
+            "mac": "08:00:00:00:09:01",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.9.100 dev eth0",
+                "arp -i eth0 -s 10.0.9.100 08:00:00:00:09:00",
+                "arp -i eth0 -s 10.0.9.2 08:00:00:00:09:02",
+                "arp -i eth0 -s 10.0.9.3 08:00:00:00:09:03",
+                "arp -i eth0 -s 10.0.9.4 08:00:00:00:09:04",
+                "arp -i eth0 -s 10.0.9.5 08:00:00:00:09:05",
+                "iperf3 -s -p 5026 -D",
+                "iperf3 -s -p 5027 -D",
+                "iperf3 -s -p 5028 -D",
+                "iperf3 -s -p 5029 -D",
+                "python3 traffic_gen.py server_main &"
+            ]
+        },
+        "h42": {
+            "ip": "10.0.9.2/24",
+            "mac": "08:00:00:00:09:02",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.9.100 dev eth0",
+                "arp -i eth0 -s 10.0.9.100 08:00:00:00:09:00",
+                "arp -i eth0 -s 10.0.9.1 08:00:00:00:09:01",
+                "arp -i eth0 -s 10.0.9.3 08:00:00:00:09:03",
+                "arp -i eth0 -s 10.0.9.4 08:00:00:00:09:04",
+                "arp -i eth0 -s 10.0.9.5 08:00:00:00:09:05",
+                "iperf3 -s -p 5017 -D",
+                "iperf3 -s -p 5018 -D",
+                "iperf3 -s -p 5019 -D",
+                "python3 traffic_gen.py server_iot &"
+            ]
+        },
+        "h43": {
+            "ip": "10.0.9.3/24",
+            "mac": "08:00:00:00:09:03",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.9.100 dev eth0",
+                "arp -i eth0 -s 10.0.9.100 08:00:00:00:09:00",
+                "arp -i eth0 -s 10.0.9.1 08:00:00:00:09:01",
+                "arp -i eth0 -s 10.0.9.2 08:00:00:00:09:02",
+                "arp -i eth0 -s 10.0.9.4 08:00:00:00:09:04",
+                "arp -i eth0 -s 10.0.9.5 08:00:00:00:09:05",
+                "python3 traffic_gen.py noise_generator &"
+            ]
+        },
+        "h44": {
+            "ip": "10.0.9.4/24",
+            "mac": "08:00:00:00:09:04",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.9.100 dev eth0",
+                "arp -i eth0 -s 10.0.9.100 08:00:00:00:09:00",
+                "arp -i eth0 -s 10.0.9.1 08:00:00:00:09:01",
+                "arp -i eth0 -s 10.0.9.2 08:00:00:00:09:02",
+                "arp -i eth0 -s 10.0.9.3 08:00:00:00:09:03",
+                "arp -i eth0 -s 10.0.9.5 08:00:00:00:09:05",
+                "python3 traffic_gen.py noise_generator &"
+            ]
+        },
+        "h45": {
+            "ip": "10.0.9.5/24",
+            "mac": "08:00:00:00:09:05",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.9.100 dev eth0",
+                "arp -i eth0 -s 10.0.9.100 08:00:00:00:09:00",
+                "arp -i eth0 -s 10.0.9.1 08:00:00:00:09:01",
+                "arp -i eth0 -s 10.0.9.2 08:00:00:00:09:02",
+                "arp -i eth0 -s 10.0.9.3 08:00:00:00:09:03",
+                "arp -i eth0 -s 10.0.9.4 08:00:00:00:09:04",
+                "python3 traffic_gen.py noise_generator &"
+            ]
+        },
+        "h46": {
+            "ip": "10.0.10.1/24",
+            "mac": "08:00:00:00:0a:01",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.10.100 dev eth0",
+                "arp -i eth0 -s 10.0.10.100 08:00:00:00:0a:00",
+                "arp -i eth0 -s 10.0.10.2 08:00:00:00:0a:02",
+                "arp -i eth0 -s 10.0.10.3 08:00:00:00:0a:03",
+                "arp -i eth0 -s 10.0.10.4 08:00:00:00:0a:04",
+                "arp -i eth0 -s 10.0.10.5 08:00:00:00:0a:05",
+                "python3 traffic_gen.py noise_generator &"
+            ]
+        },
+        "h47": {
+            "ip": "10.0.10.2/24",
+            "mac": "08:00:00:00:0a:02",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.10.100 dev eth0",
+                "arp -i eth0 -s 10.0.10.100 08:00:00:00:0a:00",
+                "arp -i eth0 -s 10.0.10.1 08:00:00:00:0a:01",
+                "arp -i eth0 -s 10.0.10.3 08:00:00:00:0a:03",
+                "arp -i eth0 -s 10.0.10.4 08:00:00:00:0a:04",
+                "arp -i eth0 -s 10.0.10.5 08:00:00:00:0a:05",
+                "python3 traffic_gen.py noise_generator &"
+            ]
+        },
+        "h48": {
+            "ip": "10.0.10.3/24",
+            "mac": "08:00:00:00:0a:03",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.10.100 dev eth0",
+                "arp -i eth0 -s 10.0.10.100 08:00:00:00:0a:00",
+                "arp -i eth0 -s 10.0.10.1 08:00:00:00:0a:01",
+                "arp -i eth0 -s 10.0.10.2 08:00:00:00:0a:02",
+                "arp -i eth0 -s 10.0.10.4 08:00:00:00:0a:04",
+                "arp -i eth0 -s 10.0.10.5 08:00:00:00:0a:05",
+                "python3 traffic_gen.py noise_generator &"
+            ]
+        },
+        "h49": {
+            "ip": "10.0.10.4/24",
+            "mac": "08:00:00:00:0a:04",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.10.100 dev eth0",
+                "arp -i eth0 -s 10.0.10.100 08:00:00:00:0a:00",
+                "arp -i eth0 -s 10.0.10.1 08:00:00:00:0a:01",
+                "arp -i eth0 -s 10.0.10.2 08:00:00:00:0a:02",
+                "arp -i eth0 -s 10.0.10.3 08:00:00:00:0a:03",
+                "arp -i eth0 -s 10.0.10.5 08:00:00:00:0a:05",
+                "python3 traffic_gen.py noise_generator &"
+            ]
+        },
+        "h50": {
+            "ip": "10.0.10.5/24",
+            "mac": "08:00:00:00:0a:05",
+            "commands": [
+                "sysctl -w net.ipv6.conf.all.disable_ipv6=1",
+                "route add default gw 10.0.10.100 dev eth0",
+                "arp -i eth0 -s 10.0.10.100 08:00:00:00:0a:00",
+                "arp -i eth0 -s 10.0.10.1 08:00:00:00:0a:01",
+                "arp -i eth0 -s 10.0.10.2 08:00:00:00:0a:02",
+                "arp -i eth0 -s 10.0.10.3 08:00:00:00:0a:03",
+                "arp -i eth0 -s 10.0.10.4 08:00:00:00:0a:04"
+            ]
+        }
+    },
+    "switches": {
+        "cs1": {
+            "runtime_json": "cs1-runtime.json"
+        },
+        "cs2": {
+            "runtime_json": "cs2-runtime.json"
+        },
+        "cs3": {
+            "runtime_json": "cs3-runtime.json"
+        },
+        "cs4": {
+            "runtime_json": "cs4-runtime.json"
+        },
+        "cs5": {
+            "runtime_json": "cs5-runtime.json"
+        },
+        "s1": {
+            "runtime_json": "s1-runtime.json"
+        },
+        "s2": {
+            "runtime_json": "s2-runtime.json"
+        },
+        "s3": {
+            "runtime_json": "s3-runtime.json"
+        },
+        "s4": {
+            "runtime_json": "s4-runtime.json"
+        },
+        "s5": {
+            "runtime_json": "s5-runtime.json"
+        },
+        "s6": {
+            "runtime_json": "s6-runtime.json"
+        },
+        "s7": {
+            "runtime_json": "s7-runtime.json"
+        },
+        "s8": {
+            "runtime_json": "s8-runtime.json"
+        },
+        "s9": {
+            "runtime_json": "s9-runtime.json"
+        },
+        "s10": {
+            "runtime_json": "s10-runtime.json"
+        }
+    },
+    "links": [
+        [
+            "cs1-p2",
+            "cs2-p1"
+        ],
+        [
+            "cs2-p2",
+            "cs3-p1"
+        ],
+        [
+            "cs3-p2",
+            "cs4-p1"
+        ],
+        [
+            "cs4-p2",
+            "cs5-p1"
+        ],
+        [
+            "cs5-p2",
+            "cs1-p1"
+        ],
+        [
+            "s1-p1",
+            "cs1-p3"
+        ],
+        [
+            "h1",
+            "s1-p2"
+        ],
+        [
+            "h2",
+            "s1-p3"
+        ],
+        [
+            "h3",
+            "s1-p4"
+        ],
+        [
+            "h4",
+            "s1-p5"
+        ],
+        [
+            "h5",
+            "s1-p6"
+        ],
+        [
+            "s2-p1",
+            "cs1-p4"
+        ],
+        [
+            "h6",
+            "s2-p2"
+        ],
+        [
+            "h7",
+            "s2-p3"
+        ],
+        [
+            "h8",
+            "s2-p4"
+        ],
+        [
+            "h9",
+            "s2-p5"
+        ],
+        [
+            "h10",
+            "s2-p6"
+        ],
+        [
+            "s3-p1",
+            "cs2-p3"
+        ],
+        [
+            "h11",
+            "s3-p2"
+        ],
+        [
+            "h12",
+            "s3-p3"
+        ],
+        [
+            "h13",
+            "s3-p4"
+        ],
+        [
+            "h14",
+            "s3-p5"
+        ],
+        [
+            "h15",
+            "s3-p6"
+        ],
+        [
+            "s4-p1",
+            "cs2-p4"
+        ],
+        [
+            "h16",
+            "s4-p2"
+        ],
+        [
+            "h17",
+            "s4-p3"
+        ],
+        [
+            "h18",
+            "s4-p4"
+        ],
+        [
+            "h19",
+            "s4-p5"
+        ],
+        [
+            "h20",
+            "s4-p6"
+        ],
+        [
+            "s5-p1",
+            "cs3-p3"
+        ],
+        [
+            "h21",
+            "s5-p2"
+        ],
+        [
+            "h22",
+            "s5-p3"
+        ],
+        [
+            "h23",
+            "s5-p4"
+        ],
+        [
+            "h24",
+            "s5-p5"
+        ],
+        [
+            "h25",
+            "s5-p6"
+        ],
+        [
+            "s6-p1",
+            "cs3-p4"
+        ],
+        [
+            "h26",
+            "s6-p2"
+        ],
+        [
+            "h27",
+            "s6-p3"
+        ],
+        [
+            "h28",
+            "s6-p4"
+        ],
+        [
+            "h29",
+            "s6-p5"
+        ],
+        [
+            "h30",
+            "s6-p6"
+        ],
+        [
+            "s7-p1",
+            "cs4-p3"
+        ],
+        [
+            "h31",
+            "s7-p2"
+        ],
+        [
+            "h32",
+            "s7-p3"
+        ],
+        [
+            "h33",
+            "s7-p4"
+        ],
+        [
+            "h34",
+            "s7-p5"
+        ],
+        [
+            "h35",
+            "s7-p6"
+        ],
+        [
+            "s8-p1",
+            "cs4-p4"
+        ],
+        [
+            "h36",
+            "s8-p2"
+        ],
+        [
+            "h37",
+            "s8-p3"
+        ],
+        [
+            "h38",
+            "s8-p4"
+        ],
+        [
+            "h39",
+            "s8-p5"
+        ],
+        [
+            "h40",
+            "s8-p6"
+        ],
+        [
+            "s9-p1",
+            "cs5-p3"
+        ],
+        [
+            "h41",
+            "s9-p2"
+        ],
+        [
+            "h42",
+            "s9-p3"
+        ],
+        [
+            "h43",
+            "s9-p4"
+        ],
+        [
+            "h44",
+            "s9-p5"
+        ],
+        [
+            "h45",
+            "s9-p6"
+        ],
+        [
+            "s10-p1",
+            "cs5-p4"
+        ],
+        [
+            "h46",
+            "s10-p2"
+        ],
+        [
+            "h47",
+            "s10-p3"
+        ],
+        [
+            "h48",
+            "s10-p4"
+        ],
+        [
+            "h49",
+            "s10-p5"
+        ],
+        [
+            "h50",
+            "s10-p6"
+        ]
+    ]
+}

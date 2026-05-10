@@ -1,0 +1,147 @@
+{
+    "target": "bmv2",
+    "p4info": "build/ddos_detection.p4.p4info.txtpb",
+    "bmv2_json": "build/ddos_detection.json",
+    "table_entries": [
+        {
+            "table": "MyIngress.ipv4_lpm",
+            "match": {
+                "hdr.ipv4.dstAddr": [
+                    "10.0.7.0",
+                    24
+                ]
+            },
+            "action_name": "MyIngress.ipv4_forward",
+            "action_params": {
+                "dstAddr": "08:00:00:00:07:00",
+                "port": 3
+            }
+        },
+        {
+            "table": "MyIngress.ipv4_lpm",
+            "match": {
+                "hdr.ipv4.dstAddr": [
+                    "10.0.8.0",
+                    24
+                ]
+            },
+            "action_name": "MyIngress.ipv4_forward",
+            "action_params": {
+                "dstAddr": "08:00:00:00:08:00",
+                "port": 4
+            }
+        },
+        {
+            "table": "MyIngress.ipv4_lpm",
+            "match": {
+                "hdr.ipv4.dstAddr": [
+                    "10.0.1.0",
+                    24
+                ]
+            },
+            "action_name": "MyIngress.ipv4_forward",
+            "action_params": {
+                "dstAddr": "08:00:00:00:cc:cc",
+                "port": 2
+            }
+        },
+        {
+            "table": "MyIngress.ipv4_lpm",
+            "match": {
+                "hdr.ipv4.dstAddr": [
+                    "10.0.2.0",
+                    24
+                ]
+            },
+            "action_name": "MyIngress.ipv4_forward",
+            "action_params": {
+                "dstAddr": "08:00:00:00:cc:cc",
+                "port": 2
+            }
+        },
+        {
+            "table": "MyIngress.ipv4_lpm",
+            "match": {
+                "hdr.ipv4.dstAddr": [
+                    "10.0.3.0",
+                    24
+                ]
+            },
+            "action_name": "MyIngress.ipv4_forward",
+            "action_params": {
+                "dstAddr": "08:00:00:00:cc:cc",
+                "port": 1
+            }
+        },
+        {
+            "table": "MyIngress.ipv4_lpm",
+            "match": {
+                "hdr.ipv4.dstAddr": [
+                    "10.0.4.0",
+                    24
+                ]
+            },
+            "action_name": "MyIngress.ipv4_forward",
+            "action_params": {
+                "dstAddr": "08:00:00:00:cc:cc",
+                "port": 1
+            }
+        },
+        {
+            "table": "MyIngress.ipv4_lpm",
+            "match": {
+                "hdr.ipv4.dstAddr": [
+                    "10.0.5.0",
+                    24
+                ]
+            },
+            "action_name": "MyIngress.ipv4_forward",
+            "action_params": {
+                "dstAddr": "08:00:00:00:cc:cc",
+                "port": 1
+            }
+        },
+        {
+            "table": "MyIngress.ipv4_lpm",
+            "match": {
+                "hdr.ipv4.dstAddr": [
+                    "10.0.6.0",
+                    24
+                ]
+            },
+            "action_name": "MyIngress.ipv4_forward",
+            "action_params": {
+                "dstAddr": "08:00:00:00:cc:cc",
+                "port": 1
+            }
+        },
+        {
+            "table": "MyIngress.ipv4_lpm",
+            "match": {
+                "hdr.ipv4.dstAddr": [
+                    "10.0.9.0",
+                    24
+                ]
+            },
+            "action_name": "MyIngress.ipv4_forward",
+            "action_params": {
+                "dstAddr": "08:00:00:00:cc:cc",
+                "port": 2
+            }
+        },
+        {
+            "table": "MyIngress.ipv4_lpm",
+            "match": {
+                "hdr.ipv4.dstAddr": [
+                    "10.0.10.0",
+                    24
+                ]
+            },
+            "action_name": "MyIngress.ipv4_forward",
+            "action_params": {
+                "dstAddr": "08:00:00:00:cc:cc",
+                "port": 2
+            }
+        }
+    ]
+}
