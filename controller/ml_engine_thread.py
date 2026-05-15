@@ -31,20 +31,20 @@ class MLEngineThread(threading.Thread):
         ddos_flows = df[df['prediction'] == 1]
 
         if not ddos_flows.empty:
-            print(f"\n[!!!] {self.controller.name} DİKKAT: {len(ddos_flows)} ADET ŞÜPHELİ DDOS AKIŞI TESPİT EDİLDİ! [!!!]")
+            # Önce saldırganı her satır için belirle
+            ddos_flows['malicious_ip'] = ddos_flows.apply(
+                lambda r: r['firstIp'] if r['first_count'] > r['second_count'] else r['secondIp'], axis=1
+            )
             
-            # Aynı IP çifti birden fazla satır (flow) oluşturmuş olabilir.
-            # Konsolu spamllememek için eşsiz (unique) Saldırgan-Kurban çiftlerini alalım:
-            unique_attackers = ddos_flows[['firstIp', 'secondIp']].drop_duplicates()
+            # Şimdi sadece eşsiz saldırganları al
+            unique_malicious_ips = ddos_flows['malicious_ip'].unique()
             
-            for index, row in unique_attackers.iterrows():
-                first_ip = row['firstIp']
-                second_ip = row['secondIp']
-                print(f" -> [TEHDİT] First IP: {first_ip} <|> Second IP: {second_ip}")
+            for m_ip in unique_malicious_ips:
+                print(f"[{self.controller.name}] DDoS Saldırısı Tespit Edildi! Saldırgan IP: {m_ip}")
+                # ---  SAVUNMA MEKANİZMASI  ---
                 
-                # --- CANLI BLOKLAMA İÇİN YER TUTUCU ---
-                # İleride P4 switch'e kural yazdırmak için burayı aktif edeceksin:
-                # self.controller.add_drop_rule(first_ip)
+                self.controller.ban_queue.put(m_ip)  # Ban kuyruğuna saldırgan IP'yi ekle
+                print(f"[{self.controller.name}] {m_ip} Ban Kuyruğuna eklendi!")
         else:
             print(f"[{self.controller.name}] 5 saniyelik pencerede trafik temiz.") # İsteğe bağlı log
         del features_for_model

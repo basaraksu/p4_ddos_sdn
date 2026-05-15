@@ -39,22 +39,32 @@ def main():
 
     # 1. Kontrolcü Objelerini (Thread) Yaratıyoruz
     # Her biri kendi bölgelerinin özelliklerini (Feature) ayrı CSV'lere yazacak!
+    # 1. Kontrolcü Objelerini (Thread) Yaratıyoruz
     c1 = DDoSController(
         name="C1", 
         switch_list=sanayi_switches, 
-        csv_file_name="features_c1.csv"
+        csv_file_name="features_c1.csv",
+        p2p_port=6001,                # Kendi dinleyeceği port
+        peers=[6002, 6003],            # Konuşacağı diğer kontrolcüler
+        controllers_in_network=["C1", "C2", "C3"]
     )
     
     c2 = DDoSController(
         name="C2", 
         switch_list=konut_switches, 
-        csv_file_name="features_c2.csv"
+        csv_file_name="features_c2.csv",
+        p2p_port=6002,
+        peers=[6001, 6003],
+        controllers_in_network=["C1", "C2", "C3"]
     )
     
     c3 = DDoSController(
         name="C3", 
         switch_list=merkez_switches, 
-        csv_file_name="features_c3.csv"
+        csv_file_name="features_c3.csv",
+        p2p_port=6003,
+        peers=[6001, 6002],
+        controllers_in_network=["C1", "C2", "C3"]
     )
 
     # 2. Bütün Kontrolcüleri Paralel Olarak (Thread) Başlatıyoruz

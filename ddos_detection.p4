@@ -59,149 +59,138 @@ control MyIngress(inout headers hdr, inout metadata meta, inout standard_metadat
         default_action = NoAction();
     }
 
+    action drop() {
+        mark_to_drop(standard_metadata);
+    }
+
+    table ipv4_acl {
+        key = {
+            hdr.ipv4.srcAddr: exact; // DİKKAT: dstAddr değil, srcAddr! Ve exact match.
+        }
+        actions = {
+            drop;
+            NoAction;
+        }
+        size = 1024;
+        default_action = NoAction();
+    }
+
    apply {
-
         if (hdr.ipv4.isValid()) {
-
-            bit<64> first_count = 0; bit<64> second_count = 0; bit<48> first_seen = 0; // bit<48> last_seen = 0;
-            bit<48> current_time = standard_metadata.ingress_global_timestamp;
-            bit<1> is_active = 0;
-            bit<64> current_packet_size = (bit<64>)standard_metadata.packet_length;
-            bit<64> packet_size_sum = 0;
-    
-
-            // --- PORT ÇEKME MANTIĞI (Geçici Meta Değişkenlerine Al) ---
-            bit<16> temp_src_port = 0;
-            bit<16> temp_dst_port = 0;
-
-            if (hdr.tcp.isValid()) {
-                temp_src_port = hdr.tcp.srcPort; 
-                temp_dst_port = hdr.tcp.dstPort;
-            } else if (hdr.udp.isValid()) {
-                temp_src_port = hdr.udp.srcPort; 
-                temp_dst_port = hdr.udp.dstPort;
+            
+            // 1. GÜMRÜK KONTROLÜ (EN BAŞTA!)
+            if (ipv4_acl.apply().hit) {
+                // Paket yasaklı listede! Zaten mark_to_drop ile işaretlendi.
+                // İstatistikleri güncellemeyip, hiçbir şey yapmadan sessizce yok olmasını sağlıyoruz.
             } 
-            // ICMP vb. için zaten 0 kalacak.
-
-            // --- SYMMETRIC KEY SIRALAMA (IP ve PORT BİRLİKTE) ---
-            if (hdr.ipv4.srcAddr < hdr.ipv4.dstAddr) {
-                // IP'ler sıralıysa, Portlar da kendi sırasında kalır
-                meta.first_ip = hdr.ipv4.srcAddr; 
-                meta.second_ip = hdr.ipv4.dstAddr;
-                meta.first_port = temp_src_port; 
-                meta.second_port = temp_dst_port;
-            } else {
-                // IP'ler yer değiştiriyorsa, PORTLAR DA YER DEĞİŞTİRMELİ!
-                meta.first_ip = hdr.ipv4.dstAddr; 
-                meta.second_ip = hdr.ipv4.srcAddr;
-                meta.first_port = temp_dst_port;   // DİKKAT: Çapraz atama yapıyoruz
-                meta.second_port = temp_src_port;  // DİKKAT: Çapraz atama yapıyoruz
-            }
-
-            // --- FLOW ID HESAPLAMA ---
-
-            hash(meta.flow_id, HashAlgorithm.crc16, (bit<32>)0, 
-                { 
-                    meta.first_ip, 
-                    meta.second_ip, 
-                    meta.first_port, 
-                    meta.second_port, 
-                    hdr.ipv4.protocol 
-                }, 
-                (bit<32>)65536);
-            
-
-
-            // Window aktif değilse first_seen'i güncelle, aktifse first_seen'i oku
-            flow_is_active.read(is_active, meta.flow_id);
-            if (is_active == 0) { // Windowdaki ilk paket
-                flow_is_active.write(meta.flow_id, 1);
-                first_seen = standard_metadata.ingress_global_timestamp;
-                flow_packet_first_seen.write(meta.flow_id, first_seen);  
-
-                // --- İLK PAKET ANINDA BİLDİRİMİ (SPOOFING YAKALAYICI) ---
-                // Yeni bir IP gördüğümüz anda Python'a "Böyle bir şey geldi" diyoruz.
-                meta.stats.flow_id = meta.flow_id;
-                meta.stats.first_ip = meta.first_ip;
-                meta.stats.second_ip = meta.second_ip;
-                meta.stats.first_port = meta.first_port;
-                meta.stats.second_port = meta.second_port;
-                meta.stats.protocol = hdr.ipv4.protocol;
-                // YÖNÜ DİNAMİK OLARAK BELİRLE!
-                if (hdr.ipv4.srcAddr == meta.first_ip) {
-                    meta.stats.first_count = 1;
-                    meta.stats.second_count = 0;
-                } else {
-                    meta.stats.first_count = 0;
-                    meta.stats.second_count = 1;
-                }
-                meta.stats.packet_size_sum = current_packet_size;
-                meta.stats.duration = 0; // Henüz süre geçmedi
-                digest(388632363, meta.stats);
-            }
             else {
-                flow_packet_first_seen.read(first_seen, meta.flow_id);
-            }
-
-
-
-            
-            
-
-            // --- İSTATİSTİK KAYIT ---
-            if (hdr.ipv4.srcAddr == meta.first_ip) {
-                flow_packet_count_first.read(first_count, meta.flow_id);
-                flow_packet_count_first.write(meta.flow_id, first_count + 1);
-            } else {
-                flow_packet_count_second.read(second_count, meta.flow_id);
-                flow_packet_count_second.write(meta.flow_id, second_count + 1);
-            }
-
-            // // --- PAKET BOYUTU İSTATİSTİKLERİ ---
-            
-            flow_packet_packet_size_sum.read(packet_size_sum, meta.flow_id);
-
-            
-            flow_packet_packet_size_sum.write(meta.flow_id, packet_size_sum + current_packet_size);
-            
-
-
-            
-
-
-
-
-            if (current_time - first_seen >= WINDOW_TIME) { // 5 saniyeden büyükse
-            
-                flow_packet_count_first.read(first_count, meta.flow_id);
-                flow_packet_count_second.read(second_count, meta.flow_id);
-                // digest flow
-                meta.stats.flow_id = meta.flow_id;
-                meta.stats.first_ip = meta.first_ip;
-                meta.stats.second_ip = meta.second_ip;
-                meta.stats.first_port = meta.first_port;
-                meta.stats.second_port = meta.second_port;
-                meta.stats.protocol = hdr.ipv4.protocol;
-                meta.stats.first_count = first_count;
-                meta.stats.second_count = second_count;
-                meta.stats.packet_size_sum = packet_size_sum + current_packet_size;
-                meta.stats.duration = (bit<64>)(current_time - first_seen);
-                digest(388632363, meta.stats); // Controller'a gönder
-
-                //registerları sıfırla
-                flow_packet_count_first.write(meta.flow_id, 0);
-                flow_packet_count_second.write(meta.flow_id, 0);
-                flow_packet_first_seen.write(meta.flow_id, 0);
-                flow_packet_last_seen.write(meta.flow_id, 0);
-                flow_packet_packet_size_sum.write(meta.flow_id, 0);
+                // 2. PAKET TEMİZ! İSTATİSTİKLERİ TUT VE YOL TARİFİ YAP
                 
+                bit<64> first_count = 0; bit<64> second_count = 0; bit<48> first_seen = 0; 
+                bit<48> current_time = standard_metadata.ingress_global_timestamp;
+                bit<1> is_active = 0;
+                bit<64> current_packet_size = (bit<64>)standard_metadata.packet_length;
+                bit<64> packet_size_sum = 0;
 
+                // --- PORT ÇEKME MANTIĞI ---
+                bit<16> temp_src_port = 0;
+                bit<16> temp_dst_port = 0;
+                if (hdr.tcp.isValid()) {
+                    temp_src_port = hdr.tcp.srcPort; 
+                    temp_dst_port = hdr.tcp.dstPort;
+                } else if (hdr.udp.isValid()) {
+                    temp_src_port = hdr.udp.srcPort; 
+                    temp_dst_port = hdr.udp.dstPort;
+                } 
 
-                flow_is_active.write(meta.flow_id, 0);
+                // --- SYMMETRIC KEY SIRALAMA ---
+                if (hdr.ipv4.srcAddr < hdr.ipv4.dstAddr) {
+                    meta.first_ip = hdr.ipv4.srcAddr; 
+                    meta.second_ip = hdr.ipv4.dstAddr;
+                    meta.first_port = temp_src_port; 
+                    meta.second_port = temp_dst_port;
+                } else {
+                    meta.first_ip = hdr.ipv4.dstAddr; 
+                    meta.second_ip = hdr.ipv4.srcAddr;
+                    meta.first_port = temp_dst_port;  
+                    meta.second_port = temp_src_port; 
+                }
+
+                // --- FLOW ID HESAPLAMA ---
+                hash(meta.flow_id, HashAlgorithm.crc16, (bit<32>)0, 
+                    { meta.first_ip, meta.second_ip, meta.first_port, meta.second_port, hdr.ipv4.protocol }, 
+                    (bit<32>)65536);
+                
+                // --- KONTROL VE İLK GÖRÜLME ---
+                flow_is_active.read(is_active, meta.flow_id);
+                if (is_active == 0) { 
+                    flow_is_active.write(meta.flow_id, 1);
+                    first_seen = standard_metadata.ingress_global_timestamp;
+                    flow_packet_first_seen.write(meta.flow_id, first_seen);  
+
+                    meta.stats.flow_id = meta.flow_id;
+                    meta.stats.first_ip = meta.first_ip;
+                    meta.stats.second_ip = meta.second_ip;
+                    meta.stats.first_port = meta.first_port;
+                    meta.stats.second_port = meta.second_port;
+                    meta.stats.protocol = hdr.ipv4.protocol;
+                    
+                    if (hdr.ipv4.srcAddr == meta.first_ip) {
+                        meta.stats.first_count = 1;
+                        meta.stats.second_count = 0;
+                    } else {
+                        meta.stats.first_count = 0;
+                        meta.stats.second_count = 1;
+                    }
+                    meta.stats.packet_size_sum = current_packet_size;
+                    meta.stats.duration = 0; 
+                    digest(388632363, meta.stats);
+                }
+                else {
+                    flow_packet_first_seen.read(first_seen, meta.flow_id);
+                }
+
+                // --- İSTATİSTİK KAYIT ---
+                if (hdr.ipv4.srcAddr == meta.first_ip) {
+                    flow_packet_count_first.read(first_count, meta.flow_id);
+                    flow_packet_count_first.write(meta.flow_id, first_count + 1);
+                } else {
+                    flow_packet_count_second.read(second_count, meta.flow_id);
+                    flow_packet_count_second.write(meta.flow_id, second_count + 1);
+                }
+                
+                flow_packet_packet_size_sum.read(packet_size_sum, meta.flow_id);
+                flow_packet_packet_size_sum.write(meta.flow_id, packet_size_sum + current_packet_size);
+
+                // --- PENCERE DOLDUYSA DIGEST AT ---
+                if (current_time - first_seen >= WINDOW_TIME) { 
+                    flow_packet_count_first.read(first_count, meta.flow_id);
+                    flow_packet_count_second.read(second_count, meta.flow_id);
+                    
+                    meta.stats.flow_id = meta.flow_id;
+                    meta.stats.first_ip = meta.first_ip;
+                    meta.stats.second_ip = meta.second_ip;
+                    meta.stats.first_port = meta.first_port;
+                    meta.stats.second_port = meta.second_port;
+                    meta.stats.protocol = hdr.ipv4.protocol;
+                    meta.stats.first_count = first_count;
+                    meta.stats.second_count = second_count;
+                    meta.stats.packet_size_sum = packet_size_sum + current_packet_size;
+                    meta.stats.duration = (bit<64>)(current_time - first_seen);
+                    digest(388632363, meta.stats); 
+
+                    // Registerları sıfırla
+                    flow_packet_count_first.write(meta.flow_id, 0);
+                    flow_packet_count_second.write(meta.flow_id, 0);
+                    flow_packet_first_seen.write(meta.flow_id, 0);
+                    flow_packet_last_seen.write(meta.flow_id, 0);
+                    flow_packet_packet_size_sum.write(meta.flow_id, 0);
+                    flow_is_active.write(meta.flow_id, 0);
+                }
+
+                // --- 3. SON OLARAK: TEMİZ PAKETİ HEDEFİNE YÖNLENDİR ---
+                ipv4_lpm.apply();
             }
-
-            // Akış takip ediliyorsa (hit), şimdi yönlendirme yapabiliriz
-            ipv4_lpm.apply();
         }
     }
 }
